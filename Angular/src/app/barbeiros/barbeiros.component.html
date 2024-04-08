@@ -1,0 +1,28 @@
+<button mat-raised-button>Barbearias</button>
+<div>
+  <mat-form-field>
+    <input matInput placeholder="Pesquisar" [(ngModel)]="searchTerm" (input)="filtrarBarbeiros()">
+  </mat-form-field>
+</div>
+<button mat-raised-button (click)="goBack()">Voltar</button>
+
+<div *ngIf="barbeirosFiltrados && barbeirosFiltrados.length > 0" class="barbeiros-container">
+    <h2>Solários Disponíveis:</h2>
+    <div class="barbeiros-items">
+      <div *ngFor="let barbeiro of barbeirosFiltrados" class="barbeiro-item" (click)="redirect(barbeiro.name)">
+        <div class="barbeiro-info">
+          <div class="favorite-icon" (click)="toggleFavorite(barbeiro.name);$event.stopPropagation()">
+            <mat-icon *ngIf="isFavorite(barbeiro.name); else notFavorite">star</mat-icon>
+            <ng-template #notFavorite><mat-icon>star_border</mat-icon></ng-template>
+        </div>
+          {{ barbeiro.name }} - {{ barbeiro.address }}
+        </div>
+        <img
+          *ngIf="barbeiro.image"
+          [src]="'/assets/images/' + barbeiro.image"
+          alt="Imagem do barbeiro"
+          class="barbeiro-image"
+        >
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,57 @@
+<!-- solarios.component.html -->
+<!-- <button mat-raised-button>Solários</button>
+<div>
+  <mat-form-field>
+    <input matInput placeholder="Pesquisar" [(ngModel)]="searchTerm" (input)="filtrarSolarios()">
+  </mat-form-field>
+</div>
+
+<div *ngIf="solariosFiltrados && solariosFiltrados.length > 0" class="solarios-container">
+  <h2>Solários Encontrados:</h2>
+  <div class="solarios-items">
+    <div *ngFor="let solario of solariosFiltrados" class="solario-item" (click)="redirect(solario.name)">
+      <div class="solario-info">
+        {{ solario.name }} - {{ solario.address }}
+      </div>
+      <img
+        *ngIf="solario.image"
+        [src]="'/assets/images/' + solario.image"
+        alt="Imagem do Solário"
+        class="solario-image"
+      >
+    </div>
+  </div>
+</div>
+
+-->
+
+<button mat-raised-button>Solários</button>
+<div>
+  <mat-form-field>
+    <input matInput placeholder="Pesquisar" [(ngModel)]="searchTerm" (input)="filtrarSolarios()">
+  </mat-form-field>
+</div>
+<button mat-raised-button (click)="goBack()">Voltar</button>
+
+<div *ngIf="solariosFiltrados && solariosFiltrados.length > 0" class="solarios-container">
+  <h2>Solários Disponíveis:</h2>
+  <div class="solarios-items">
+    <div *ngFor="let solario of solariosFiltrados" class="solario-item" (click)="redirect(solario.name)">
+      <div class="solario-info">
+      <div class="favorite-icon" (click)="toggleFavorite(solario.name);$event.stopPropagation()">
+          <mat-icon *ngIf="isFavorite(solario.name); else notFavorite">star</mat-icon>
+          <ng-template #notFavorite><mat-icon>star_border</mat-icon></ng-template>
+      </div>
+
+        {{ solario.name }} - {{ solario.address }}
+      </div>
+      <img
+        *ngIf="solario.image"
+        [src]="'/assets/images/' + solario.image"
+        alt="Imagem do Solário"
+        class="solario-image"
+      >
+    </div>
+  </div>
+</div>
+

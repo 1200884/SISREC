@@ -1,0 +1,23 @@
+  <div id="app">
+    <nav id="bar" class="navbar navbar-expand navbar-dark bg-dark">
+      <a href="home" class="navbar-brand" routerLink="">Movie App</a>
+  
+      <ul class="navbar-nav mr-auto" routerLinkActive="active">
+        
+        <button id="logOut" mat-raised-button (click)="logout()">Logout</button>
+        <mat-icon class="profile-icon" routerLink="/profile">person</mat-icon>
+        
+      </ul>
+    </nav>
+
+    <router-outlet></router-outlet>
+    <div *ngIf="loggedIn">
+      <!-- <div class="alert alert-info" *ngIf="isAClient">
+        Olá Cliente (App Component)
+      </div>
+      <div class="alert alert-info" *ngIf="isAEmployee">
+         Olá Funcionário (App Component)
+      </div> -->
+    </div>
+
+  </div>

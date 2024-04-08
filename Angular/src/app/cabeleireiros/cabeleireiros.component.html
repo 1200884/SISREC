@@ -1,0 +1,29 @@
+<!-- cabeleireiros.component.html -->
+<button mat-raised-button>Cabeleireiros</button>
+<div>
+  <mat-form-field>
+    <input matInput placeholder="Pesquisar" [(ngModel)]="searchTerm" (input)="filtrarCabeleireiros()">
+  </mat-form-field>
+</div>
+<button mat-raised-button (click)="goBack()">Voltar</button>
+<div *ngIf="cabeleireirosFiltrados && cabeleireirosFiltrados.length > 0" class="cabeleireiros-container">
+    <h2>Solários Disponíveis:</h2>
+    <div class="cabeleireiros-items">
+      <div *ngFor="let cabeleireiro of cabeleireirosFiltrados" class="cabeleireiro-item" (click)="redirect(cabeleireiro.name)">
+        <div class="cabeleireiro-info">
+          <div class="favorite-icon" (click)="toggleFavorite(cabeleireiro.name);$event.stopPropagation()">
+            <mat-icon *ngIf="isFavorite(cabeleireiro.name); else notFavorite">star</mat-icon>
+            <ng-template #notFavorite><mat-icon>star_border</mat-icon></ng-template>
+        </div>
+          {{ cabeleireiro.name }} - {{ cabeleireiro.address }}
+        </div>
+        <img
+          *ngIf="cabeleireiro.image"
+          [src]="'/assets/images/' + cabeleireiro.image"
+          alt="Imagem do Cabeleireiro"
+          class="cabeleireiro-image"
+        >
+      </div>
+    </div>
+  </div>
+  

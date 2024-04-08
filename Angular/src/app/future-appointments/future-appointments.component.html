@@ -1,0 +1,35 @@
+<!-- future-appointments.component.html -->
+
+<div class="container">
+  <h2>Próximos Compromissos</h2>
+
+  <div *ngIf="futureAppointments.length === 0">
+      <p>Não há compromissos futuros.</p>
+  </div>
+
+  <div *ngIf="futureAppointments.length > 0">
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Hora</th>
+            <th>Local</th>
+            <th>Cancelar Compromissos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let appointment of futureAppointments">
+            <td>{{ appointment.day | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ appointment.day | date: 'HH:mm' }}</td>
+            <td>{{ appointment.place }}</td>
+            <td>
+              <button (click)="cancelarCompromisso(appointment.day, appointment.place, appointment.email, appointment.accountable, appointment.type)" class="btn btn-danger">Cancelar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="marcacaoCancelada">
+          <p>Marcação cancelada com sucesso!</p>
+      </div>
+    </div>
+</div>

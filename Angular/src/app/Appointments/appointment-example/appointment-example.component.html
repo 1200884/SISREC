@@ -1,0 +1,48 @@
+<div>
+    <div class="solario-item">
+        <div class="solario-info">
+            {{ name }} - {{ address }}
+        </div>
+        <img *ngIf="image" [src]="'/assets/images/' + image" alt="Imagem do Solário" class="solario-image">
+    </div>
+    <div *ngIf="showButtons">
+        <button mat-raised-button (click)="registerCorte()">Corte 13€</button>
+        <button mat-raised-button (click)="registerLavarCabelo()">Lavar o Cabelo 10€</button>
+        <button mat-raised-button (click)="registerPintarCabelo()">Pintar o Cabelo 16€</button>
+    </div>
+    <div *ngIf="showAdditionalButtons2">
+        <button mat-raised-button (click)="registerJoao()">João</button>
+        <button mat-raised-button (click)="registerPedro()">Pedro</button>
+        <button mat-raised-button (click)="registerMiguel()">Miguel</button>
+    </div>
+    <div *ngIf="showAdditionalButtons3">
+        <!--<div>
+            <label for="selectedDate">Escolha a Data e Hora:</label>
+            <input type="datetime-local" id="selectedDate" name="selectedDate" [(ngModel)]="selectedDate">
+        </div>
+        <button mat-raised-button (click)="createAppointment()">Criar Compromisso</button>
+    </div>-->
+        <div id="availableTimes" *ngIf="selectedDate">
+            <label for="selectedDate">Escolha a Data:</label>
+            <input type="date" id="selectedDate" name="selectedDate" [(ngModel)]="selectedDate"
+                (change)="showAvailableTimes()">
+            <select [(ngModel)]="selectedMinutes" *ngIf="showavailableTimes">
+                <option *ngFor="let option of availableTimes" [value]="option">{{ option }}</option>
+            </select>
+        </div>
+
+        <button mat-raised-button (click)="createAppointment()">Criar Compromisso</button>
+        <div *ngIf="showSuccessMessage" class="success-message">
+            Marcação criada com sucesso!
+          </div>
+        <div *ngIf="showErrorMessage" class="error-message" >
+            Não foi possível registar a sua marcação. Tente novamente mais tarde
+          </div>
+          
+          
+    </div>
+
+    <button mat-raised-button (click)="goBack()">Voltar</button>
+
+
+</div>
