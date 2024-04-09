@@ -1,8 +1,9 @@
 from fastapi import FastAPI
+from routes import checkRouter, userRouter
+from models import *
+
 
 app = FastAPI()
 
-
-@app.get("/", tags=["Testing"])
-async def root():
-    return {"message": "Hello World"}
+app.include_router(checkRouter.router)
+app.include_router(userRouter.router)
