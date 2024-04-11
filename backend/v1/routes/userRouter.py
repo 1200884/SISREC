@@ -4,6 +4,7 @@ from database import *
 from typing import List
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
@@ -14,6 +15,16 @@ async def createUser(*, session: AsyncSession = Depends(get_db), user: UserCreat
     await session.commit()
     await session.refresh(db_user)
     return db_user
+
+@router.post("/login", summary="Login")
+async def loginUser(*, session: AsyncSession = Depends(get_db), user: UserLogin):
+    query = select(User).where(User.email == user.email).where(User.password == user.password)
+    result = await session.execute(query)
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found or login credencials are wrong")
+    else:
+        return {"status": "Verified"}
 
 @router.get("/{user_id}", summary="Get user by id")
 async def getUserByID(*, session: AsyncSession = Depends(get_db), user_id: int):

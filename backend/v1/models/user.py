@@ -17,3 +17,7 @@ class UserUpdate(SQLModel):
     name: Optional[str]   
     email: Optional[str]   
     password: Optional[str]
+
+class UserLogin(SQLModel): 
+    email: str 
+    password: str
