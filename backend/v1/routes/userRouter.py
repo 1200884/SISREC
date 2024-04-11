@@ -10,6 +10,10 @@ router = APIRouter(prefix='/users', tags=['Users'])
 
 @router.post("/", summary="Create a user")
 async def createUser(*, session: AsyncSession = Depends(get_db), user: UserCreate):
+    query = select(User).where(User.email == user.email)
+    user = await session.execute(query)
+    if user.scalars().first():
+        raise HTTPException(status_code=400, detail="User already exists with this email")
     db_user = User(name=user.name, email=user.email, password=user.password)
     session.add(db_user)
     await session.commit()
