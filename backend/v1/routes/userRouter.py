@@ -16,10 +16,24 @@ async def createUser(*, session: AsyncSession = Depends(get_db), user: UserCreat
     return db_user
 
 @router.get("/{user_id}", summary="Get user by id")
-async def getProductByID(*, session: AsyncSession = Depends(get_db), user_id: int):
+async def getUserByID(*, session: AsyncSession = Depends(get_db), user_id: int):
     user = await session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="user not found")
     return user
+
+@router.patch("/{user_id}", summary="Update a user")
+async def update_user(*, session: AsyncSession = Depends(get_db), user_id: int, user: UserUpdate):
+    db_user = await session.get(User, user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    values = user.dict(exclude_unset=True)
+    for k, v in values.items():
+        setattr(db_user, k, v)
+
+    session.add(db_user)
+    await session.commit()
+    await session.refresh(db_user)
+    return db_user
 
 
