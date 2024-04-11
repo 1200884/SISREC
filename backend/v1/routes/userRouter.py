@@ -1,21 +1,25 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlmodel import Session, select
 from models import *
 from database import *
 from typing import List
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
-@router.post("/")
-async def create_user():
-    return {"status": "User Created!"}
+@router.post("/", summary="Create a user")
+async def createUser(*, session: AsyncSession = Depends(get_db), user: UserCreate):
+    db_user = User(name=user.name, email=user.email, password=user.password)
+    session.add(db_user)
+    await session.commit()
+    await session.refresh(db_user)
+    return db_user
 
-@router.get("/")
-async def read_users():
-    return {"status": "Presented all the users!"}
-
-@router.get("/{user_id}")
-async def read_user(user_id:int):
-    return {"status": f"Presented the user with id {user_id}!"}
+@router.get("/{user_id}", summary="Get user by id")
+async def getProductByID(*, session: AsyncSession = Depends(get_db), user_id: int):
+    user = await session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="user not found")
+    return user
 
 

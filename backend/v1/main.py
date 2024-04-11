@@ -1,4 +1,5 @@
 import uvicorn
+from database import *
 from fastapi import FastAPI
 from routes import checkRouter, userRouter
 from models import *
