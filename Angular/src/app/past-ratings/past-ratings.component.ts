@@ -5,15 +5,15 @@ import { Router } from '@angular/router';
 import { Appointment } from '../_models/Appointment';
 
 @Component({
-  selector: 'app-past-appointments',
-  templateUrl: './past-appointments.component.html',
-  styleUrls: ['./past-appointments.component.css']
+  selector: 'app-past-ratings',
+  templateUrl: './past-ratings.component.html',
+  styleUrls: ['./past-ratings.component.css']
 })
-export class PastAppointmentsComponent {
+export class PastRatingsComponent {
 
   p: number = 1;
   searchTerm: string = '';
-  pastAppointments: Appointment[] = [];
+  pastRatings: Appointment[] = [];
   barbeirosFiltrados: any[] = [];
   favoritos: string[] = [];
   userEmail = this.authService.getUserEmail();
@@ -21,25 +21,25 @@ export class PastAppointmentsComponent {
   constructor(private appointmentService: AppointmentService, private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
-    this.carregarPastAppointments();
-    console.log("past appoitnments ->" + this.pastAppointments)
+    this.carregarPastRatings();
+    console.log("past Ratings ->" + this.pastRatings)
   }
 
-  carregarPastAppointments() {
+  carregarPastRatings() {
     // Obter os compromissos do cliente usando subscribe
     this.appointmentService.getAppointmentsFromClient(this.userEmail).subscribe(allAppointments => {
       // Obter a data atual
       const currentDate = new Date();
 
       // Filtrar os compromissos futuros
-      this.pastAppointments = allAppointments.filter(appointment => {
+      this.pastRatings = allAppointments.filter(appointment => {
         const appointmentDate = new Date(appointment.day); // Certifique-se de que a propriedade 'day' existe no objeto do compromisso
         console.log("appointmentdate= " + appointmentDate)
         console.log("current date -> " + currentDate)
         return appointmentDate < currentDate;
       });
-      this.pastAppointments.reverse();
-      console.log("past appointments -> " + this.pastAppointments)
+      this.pastRatings.reverse();
+      console.log("past Ratings -> " + this.pastRatings)
     });
   }
 

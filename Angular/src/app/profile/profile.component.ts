@@ -14,9 +14,9 @@ export class ProfileComponent {
     // Redirecionar para a página de registro de funcionários
     this.router.navigate(['/future-appointments']);
   }
-  pastAppointments() {
+  pastRatings() {
     // Redirecionar para a página de registro de funcionários
-    this.router.navigate(['/past-appointments']);
+    this.router.navigate(['/past-ratings']);
   }
   accountSettings() {
     // Redirecionar para a página de registro de funcionários

@@ -19,7 +19,7 @@ import { FavoritosComponent } from './favoritos/favoritos.component';
 import { DescriptionExampleComponent } from './Descriptions/description-example/description-example.component';
 import { AppointmentExampleComponent } from './Appointments/appointment-example/appointment-example.component';
 import { ProfileComponent } from './profile/profile.component';
-import { PastAppointmentsComponent } from './past-appointments/past-appointments.component';
+import { PastRatingsComponent } from './past-ratings/past-ratings.component';
 import { FutureAppointmentsComponent } from './future-appointments/future-appointments.component';
 import { AccountSettingsComponent } from './account-settings/account-settings.component';
 const routes: Routes = [
@@ -43,7 +43,7 @@ const routes: Routes = [
   { path: 'description1', component: DescriptionExampleComponent },
   { path: 'appointment1', component: AppointmentExampleComponent },
   { path: 'profile', component: ProfileComponent },
-  { path: 'past-appointments', component: PastAppointmentsComponent },
+  { path: 'past-ratings', component: PastRatingsComponent },
   { path: 'future-appointments', component: FutureAppointmentsComponent },
   {path: 'account-settings', component: AccountSettingsComponent}
   //{ path: 'login/callback', component: OktaCallbackComponent },

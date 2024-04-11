@@ -8,6 +8,7 @@ export const environment = {
   LOGISTICS_URL_LOCAL: 'http://localhost:2223/api',
   //WAREHOUSE_URL: 'http://vsgate-s1.dei.isep.ipp.pt:10414/api',
   //WAREHOUSE_URL_LOCAL: "https://localhost:5001/api",
+  BACKEND_URL_LOCAL: 'http://localhost:5000',
 
   APPOINTMENTS_URL: "/appointment",
   AUTH_URL: "/auth",

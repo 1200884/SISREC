@@ -34,7 +34,7 @@ import { CalendarModule } from 'angular-calendar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ProfileComponent } from './profile/profile.component';
 import { FutureAppointmentsComponent } from './future-appointments/future-appointments.component';
-import { PastAppointmentsComponent } from './past-appointments/past-appointments.component';
+import { PastRatingsComponent } from './past-ratings/past-ratings.component';
 import { AccountSettingsComponent } from './account-settings/account-settings.component';
 
 @NgModule({
@@ -60,7 +60,7 @@ import { AccountSettingsComponent } from './account-settings/account-settings.co
     DescriptionExampleComponent,
     ProfileComponent,
     FutureAppointmentsComponent,
-    PastAppointmentsComponent,
+    PastRatingsComponent,
     AccountSettingsComponent
    
   ],

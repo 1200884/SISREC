@@ -1,13 +1,13 @@
-<!-- past-appointments.component.html -->
+<!-- past-ratings.component.html -->
 
 <div class="container">
     <h2>Histórico de Avaliações</h2>
   
-    <div *ngIf="pastAppointments.length === 0">
+    <div *ngIf="pastRatings.length === 0">
       <p>Não há avaliações realizadas.</p>
     </div>
   
-    <div *ngIf="pastAppointments.length > 0">
+    <div *ngIf="pastRatings.length > 0">
       <table class="table table-bordered table-striped">
         <thead>
           <tr>
@@ -17,7 +17,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let appointment of pastAppointments">
+          <tr *ngFor="let appointment of pastRatings">
             <td>{{ appointment.day | date: 'dd/MM/yyyy' }}</td>
             <td>{{ appointment.day | date: 'HH:mm' }}</td>
             <td>{{ appointment.place }}</td>
