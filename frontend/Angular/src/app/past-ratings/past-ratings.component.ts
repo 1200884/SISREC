@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AppointmentService } from '../_services/appointment.service';
 import { AuthService } from '../_services/auth.service';
-import { Router } from '@angular/router';
+//import { Router } from '@angular/router';
 import { Appointment } from '../_models/Appointment';
 
 @Component({
@@ -18,7 +18,9 @@ export class PastRatingsComponent {
   favoritos: string[] = [];
   userEmail = this.authService.getUserEmail();
 
-  constructor(private appointmentService: AppointmentService, private authService: AuthService, private router: Router) { }
+  constructor(private appointmentService: AppointmentService, private authService: AuthService, //private router: Router
+    
+  ) { }
 
   ngOnInit() {
     this.carregarPastRatings();
