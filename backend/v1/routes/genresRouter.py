@@ -10,7 +10,7 @@ import os
 
 router = APIRouter(prefix='/genres', tags=['Genres'])
 
-@router.post("/", summary="Put genres in the database")
+@router.post("/", response_model=GenreRead, summary="Put genres in the database")
 async def getGenres(*, session: AsyncSession = Depends(get_db)):
     lista = []
     script_dir = os.path.dirname(__file__)
@@ -34,9 +34,9 @@ async def getGenres(*, session: AsyncSession = Depends(get_db)):
         gender = Genre(name=item)
         session.add(gender)
         await session.commit()
-    return {"genders": lista}
+    return {"genres": lista}
 
-@router.get("/", summary="Get all genres")
+@router.get("/", response_model=GenreRead, summary="Get all genres")
 async def getGenres(*, session: AsyncSession = Depends(get_db)):
     listaGenres = []
     query = select(Genre)
@@ -44,4 +44,16 @@ async def getGenres(*, session: AsyncSession = Depends(get_db)):
     allGenres = genres.scalars().all()
     for genre in allGenres:
         listaGenres.append(genre.name)
-    return listaGenres
+    return {"genres": listaGenres}
+
+@router.post("/", response_model=GenreReturn, summary="Create a genre")
+async def createGenre(*, session: AsyncSession = Depends(get_db), genreCreate: GenreCreate):
+    query = select(Genre).where(Genre.name == genreCreate.email)
+    genre = await session.execute(query)
+    if genre.scalars().first():
+        raise HTTPException(status_code=400, detail="Genre already exists")
+    db_genre = GenreRead(name=genreCreate.name)
+    session.add(db_genre)
+    await session.commit()
+    await session.refresh(db_genre)
+    return db_genre
