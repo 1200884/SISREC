@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import {SocialAuthService,SocialUser} from '@abacritt/angularx-social-login';
 import { AuthService } from './_services/auth.service';
 import { User } from 'src/app/_models/User';
 
@@ -26,14 +25,14 @@ export class AppComponent implements OnInit {
   title = 'Angular12JwtAuth';
   private roles: string[] = [];
   username?: string;
-  user: SocialUser | undefined;
+  user: undefined;
   loggedIn: boolean | undefined;
   isSignInFailed = false;
   isAClient= false;
   isAEmployee=false;
-  constructor(private authService: AuthService,public socialAuthService: SocialAuthService,private router: Router) {
+  constructor(private authService: AuthService,private router: Router) {
    
-      this.router.navigate(['/board-client']);
+  this.router.navigate(['/board-client']);
     
     if (this.isAEmployee) {
       // Navegar para a rota /board-employee
@@ -75,81 +74,17 @@ export class AppComponent implements OnInit {
   }
 
   logout(): void {
-    this.socialAuthService.signOut();
+    //this.socialAuthService.signOut();
   }
   openRegisterForm(){
     console.log("opening register form")
     this.router.navigate(['/register']);
   }
   verifyLogin() {
-    console.log("verify login")
-    this.socialAuthService.authState.subscribe((user) => {
-      this.user = user;
-      console.log("alberto é "+this.loggedIn)
-      this.loggedIn = user != null; 
-      if (this.loggedIn) {
-        console.log(user.email);
-        this.authService.logIn('JoaoGaspar', 'JoaoGaspar').subscribe(
-          data => {
-            this.isClient();
-            this.isEmployee();
-            this.authService.setUserEmail(user.email);
-            //this.authService.setName(data.firstName+" "+ data.lastName);
-            //this.authService.setPhoneNumber(data.phoneNumber);
-          },
-          err => {
-            console.log("erro");
-            this.socialAuthService.signOut();
-            this.isSignInFailed = true;
-          }
-        );
-        
-        console.log("this is client"+this.isAClient)
-        this.hideRegistrationForm();
-
-      }
-      else{
-        console.log(this.loggedIn+ "is not loggedin?")
-        this.loggedIn=false;
-      }
-    });
+    console.log("verify login");
   }
   
   
-  isClient() {
-    console.log("isclient acedido");
-    if (this.user) {
-      this.authService.isClient(this.user.email).subscribe((isClient) => {
-        if (isClient) {
-          // O usuário é um cliente
-          console.log('Usuário é um cliente.');
-          this.isAClient=true;
-          this.router.navigate(['/board-client']);
-        } else {
-          this.isAClient=false;
-          // O usuário não é um cliente
-          console.log('Usuário não é um cliente.');
-          // Faça ações específicas para outros tipos de usuários aqui.
-        }
-      });
-    }
-  }
-  isEmployee() {
-    console.log("isEmployee acedido");
-    if (this.user) {
-      this.authService.isEmployee(this.user.email).subscribe((isEmployee) => {
-        if (isEmployee) {
-          console.log('Usuário é um Employee.');
-          this.isAEmployee=true;
-          this.router.navigate(['/board-employee']);
-        } else {
-          this.isAEmployee=false;
-          console.log('Usuário não é um Employee.');
-         
-        }
-      });
-    }
-  }
   submitRegistrationFormClient() {
     console.log('Primeiro Nome:', this.newuserfirstname);
     console.log('Último Nome:', this.newuserlastname);

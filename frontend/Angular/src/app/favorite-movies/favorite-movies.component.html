@@ -3,11 +3,11 @@
 <div class="container">
   <h2>Filmes Preferidos</h2>
 
-  <div *ngIf="futureAppointments.length === 0">
+  <div *ngIf="favoriteMovies.length === 0">
       <p>Não há filmes preferidos.</p>
   </div>
 
-  <div *ngIf="futureAppointments.length > 0">
+  <div *ngIf="favoriteMovies.length > 0">
       <table class="table table-bordered table-striped">
         <thead>
           <tr>
@@ -18,9 +18,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let appointment of futureAppointments">
-            <td>{{ appointment.day | date: 'dd/MM/yyyy' }}</td>
-            <td>{{ appointment.day | date: 'HH:mm' }}</td>
+          <tr *ngFor="let appointment of favoriteMovies">
+            
             <td>{{ appointment.place }}</td>
             <td>
               <button (click)="cancelarCompromisso(appointment.day, appointment.place, appointment.email, appointment.accountable, appointment.type)" class="btn btn-danger">Cancelar</button>

@@ -10,17 +10,13 @@ import { BoardEmployeeComponent } from './board-employee/board-employee.componen
 import { RegisterEmployeeComponent } from './register-employee/register-employee.component';
 import { ReservationsComponent } from './reservations/reservations.component';
 import { DisableEmployeeComponent } from './disable-employee/disable-employee.component';
-import { SolariosComponent } from './solarios/solarios.component';
-import { EsteticistasComponent } from './esteticistas/esteticistas.component';
-import { CabeleireirosComponent } from './cabeleireiros/cabeleireiros.component';
-import { BarbeirosComponent } from './barbeiros/barbeiros.component';
+
 import { ExemploestabelecimentoComponent } from './estabelecimentosespecificos/exemploestabelecimento/exemploestabelecimento.component';
 import { FavoritosComponent } from './favoritos/favoritos.component';
 import { DescriptionExampleComponent } from './Descriptions/description-example/description-example.component';
-import { AppointmentExampleComponent } from './Appointments/appointment-example/appointment-example.component';
 import { ProfileComponent } from './profile/profile.component';
 import { PastRatingsComponent } from './past-ratings/past-ratings.component';
-import { FutureAppointmentsComponent } from './future-appointments/future-appointments.component';
+import { FavoriteMoviesComponent } from './favorite-movies/favorite-movies.component';
 import { AccountSettingsComponent } from './account-settings/account-settings.component';
 const routes: Routes = [
   //{ path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -34,17 +30,12 @@ const routes: Routes = [
   { path: 'register-employee', component: RegisterEmployeeComponent },
   { path: 'reservations', component: ReservationsComponent },
   { path: 'disable-employee', component: DisableEmployeeComponent },
-  { path: 'solarios', component: SolariosComponent },
-  { path: 'esteticistas', component: EsteticistasComponent },
-  { path: 'cabeleireiros', component: CabeleireirosComponent },
-  { path: 'barbeiros', component: BarbeirosComponent },
   { path: 'favoritos', component: FavoritosComponent },
   { path: 'solario1', component: ExemploestabelecimentoComponent },
   { path: 'description1', component: DescriptionExampleComponent },
-  { path: 'appointment1', component: AppointmentExampleComponent },
   { path: 'profile', component: ProfileComponent },
   { path: 'past-ratings', component: PastRatingsComponent },
-  { path: 'future-appointments', component: FutureAppointmentsComponent },
+  { path: 'favorite-movies', component: FavoriteMoviesComponent },
   {path: 'account-settings', component: AccountSettingsComponent}
   //{ path: 'login/callback', component: OktaCallbackComponent },
 ];

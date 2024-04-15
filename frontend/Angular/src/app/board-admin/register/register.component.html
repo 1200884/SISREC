@@ -1,19 +1,19 @@
 <form (submit)="onSubmitClient()">
   <div class="form-group">
     <label for="firstName">Primeiro Nome</label>
-    <input type="text" id="firstName" name="firstName" class="form-control" [(ngModel)]="form.firstName">
+    <input type="text" id="firstName" name="firstName" class="form-control" >
   </div>
   <div class="form-group">
     <label for="lastName">Último Nome</label>
-    <input type="text" id="lastName" name="lastName" class="form-control" [(ngModel)]="form.lastName">
+    <input type="text" id="lastName" name="lastName" class="form-control" >
   </div>
   <div class="form-group">
     <label for="email">Email</label>
-    <input type="email" id="email" name="email" class="form-control" [(ngModel)]="form.email">
+    <input type="email" id="email" name="email" class="form-control" >
   </div>
   <div class="form-group">
     <label for="phoneNumber">Número de Telefone</label>
-    <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" [(ngModel)]="form.phoneNumber">
+    <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" >
   </div>
   <button type="submit" class="btn btn-primary">Registar</button>
   <button class="btn btn-primary" (click)="goBack(); hideRegistrationForm()">Voltar</button>

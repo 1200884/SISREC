@@ -1,43 +1,42 @@
-// future-appointments.component.ts
+// favorite-movies.component.ts
 
 import { Component } from '@angular/core';
 import { AppointmentService } from '../_services/appointment.service';
 import { AuthService } from '../_services/auth.service';
-import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-future-appointments',
-  templateUrl: './future-appointments.component.html',
-  styleUrls: ['./future-appointments.component.css']
+  selector: 'app-favorite-movies',
+  templateUrl: './favorite-movies.component.html',
+  styleUrls: ['./favorite-movies.component.css']
 })
-export class FutureAppointmentsComponent {
+export class FavoriteMoviesComponent {
 
   searchTerm: string = '';
-  futureAppointments: any[] = [];
+  favoriteMovies: any[] = [];
   barbeirosFiltrados: any[] = [];
   favoritos: string[] = [];
   userEmail = this.authService.getUserEmail();
   marcacaoCancelada: boolean = false;
 
-  constructor(private appointmentService: AppointmentService, private authService: AuthService, private router: Router) { }
+  constructor(private appointmentService: AppointmentService, private authService: AuthService) { }
 
   ngOnInit() {
-    this.carregarFutureAppointments();
-    console.log("future appoitnments ->" + this.futureAppointments)
+    this.carregarFavoriteMovies();
+    console.log("future appoitnments ->" + this.favoriteMovies)
   }
 
-  carregarFutureAppointments() {
+  carregarFavoriteMovies() {
     // Obter os compromissos do cliente usando subscribe
     this.appointmentService.getAppointmentsFromClient(this.userEmail).subscribe(allAppointments => {
       // Obter a data atual
       const currentDate = new Date();
 
       // Filtrar os compromissos futuros
-      this.futureAppointments = allAppointments.filter(appointment => {
+      this.favoriteMovies = allAppointments.filter(appointment => {
         const appointmentDate = new Date(appointment.day);
         return appointmentDate > currentDate;
       });
-      console.log("future appointments -> " + this.futureAppointments)
+      console.log("future appointments -> " + this.favoriteMovies)
     });
   }
 
@@ -51,7 +50,7 @@ export class FutureAppointmentsComponent {
       }
     );
     setTimeout(() => {
-      this.router.navigate(['/profile']);
+      //this.router.navigate(['/profile']);
     }, 2300); 
   }
 }
