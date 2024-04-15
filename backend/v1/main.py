@@ -10,7 +10,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 async def lifespan(app:FastAPI):
     scheduler = BackgroundScheduler()
     recommendationRouter.nonPersonalizedToFile()
-    scheduler.add_job(recommendationRouter.nonPersonalizedToFile,"interval",seconds = 20)
+    scheduler.add_job(recommendationRouter.nonPersonalizedToFile,"interval",hours = 1)
     scheduler.start()
     yield
 
