@@ -11,8 +11,8 @@ async def nonPersonalised():
     script_dir = os.path.dirname(__file__)
     path = os.path.join(script_dir, '../utils/NonPersonalized.json')
     if os.stat(path).st_size == 0:
-        df_rating = pd.read_parquet(os.path.join(script_dir, '../recommender/dataset/ratings.parquet'))
-        df_movie = pd.read_parquet(os.path.join(script_dir,'../recommender/dataset/movies.parquet'))
+        df_rating = pd.read_csv(os.path.join(script_dir, '../recommender/dataset/ratings.csv'))
+        df_movie = pd.read_csv(os.path.join(script_dir,'../recommender/dataset/movies.csv'))
 
         df_rating = df_rating[['movieId', 'rating']]
         df_movie = df_movie[['movieId', 'title']]
@@ -50,8 +50,8 @@ def nonPersonalizedToFile():
     finally:
         with open(path, "w") as file:
             script_dir = os.path.dirname(__file__)
-            df_rating = pd.read_parquet(os.path.join(script_dir, '../recommender/dataset/ratings.parquet'))
-            df_movie = pd.read_parquet(os.path.join(script_dir,'../recommender/dataset/movies.parquet'))
+            df_rating = pd.read_csv(os.path.join(script_dir, '../recommender/dataset/ratings.csv'))
+            df_movie = pd.read_csv(os.path.join(script_dir,'../recommender/dataset/movies.csv'))
 
             df_rating = df_rating[['movieId', 'rating']]
             df_movie = df_movie[['movieId', 'title']]
