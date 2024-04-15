@@ -2,10 +2,19 @@ import uvicorn
 from database import *
 from fastapi import FastAPI
 from routes import checkRouter, userRouter,genresRouter, recommendationRouter
-
 from models import *
+from contextlib import asynccontextmanager
+from apscheduler.schedulers.background import BackgroundScheduler
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app:FastAPI):
+    scheduler = BackgroundScheduler()
+    recommendationRouter.nonPersonalizedToFile()
+    scheduler.add_job(recommendationRouter.nonPersonalizedToFile,"interval",seconds = 20)
+    scheduler.start()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(checkRouter.router)
 app.include_router(userRouter.router)
