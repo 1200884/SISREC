@@ -5,16 +5,24 @@ from typing import List
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
+from sqlalchemy import desc
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
 @router.post("/", response_model=UserRead, summary="Create a user")
 async def createUser(*, session: AsyncSession = Depends(get_db), userCreate: UserCreate):
+    lastUserIdPlusOne = 0
     query = select(User).where(User.email == userCreate.email)
     user = await session.execute(query)
     if user.scalars().first():
         raise HTTPException(status_code=400, detail="User already exists with this email")
-    db_user = User(name=userCreate.name, email=userCreate.email, password=userCreate.password, genres=userCreate.genres)
+    result = await session.execute(select(User).order_by(desc(User.id)))
+    lastUser = result.scalars().first()
+    if not lastUser:
+        lastUserIdPlusOne = 200000
+    else:
+        lastUserIdPlusOne = lastUser.id + 1
+    db_user = User(id=lastUserIdPlusOne,name=userCreate.name, email=userCreate.email, password=userCreate.password, genres=userCreate.genres)
     session.add(db_user)
     await session.commit()
     await session.refresh(db_user)
@@ -28,18 +36,18 @@ async def loginUser(*, session: AsyncSession = Depends(get_db), userLogin: UserL
     if not user:
         raise HTTPException(status_code=404, detail="User not found or login credencials are wrong")
     else:
-        return {"status": "Verified"}
+        return {"status": "Verified", "user": user.id}
 
-@router.get("/{user_id}", response_model=UserRead, summary="Get user by id")
-async def getUserByID(*, session: AsyncSession = Depends(get_db), user_id: int):
-    user = await session.get(User, user_id)
+@router.get("/{id}", response_model=UserRead, summary="Get user by id")
+async def getUserByID(*, session: AsyncSession = Depends(get_db), id: int):
+    user = await session.get(User, id)
     if not user:
         raise HTTPException(status_code=404, detail="user not found")
     return user
 
-@router.patch("/{user_id}", response_model=UserRead, summary="Update a user")
-async def update_user(*, session: AsyncSession = Depends(get_db), user_id: int, user: UserUpdate):
-    db_user = await session.get(User, user_id)
+@router.patch("/{id}", response_model=UserRead, summary="Update a user")
+async def update_user(*, session: AsyncSession = Depends(get_db), id: int, user: UserUpdate):
+    db_user = await session.get(User, id)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     values = user.dict(exclude_unset=True)
@@ -50,5 +58,7 @@ async def update_user(*, session: AsyncSession = Depends(get_db), user_id: int, 
     await session.commit()
     await session.refresh(db_user)
     return db_user
+                     
+
 
 
