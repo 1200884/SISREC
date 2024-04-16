@@ -17,7 +17,8 @@ async def lifespan(app:FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-origins = ["*"]
+origins = [    "*",  # Adicione a origem do seu frontend Angular aqui
+]
 
 app.add_middleware(
     CORSMiddleware,

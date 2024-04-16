@@ -5,17 +5,13 @@
     <ul class="navbar-nav mr-auto" routerLinkActive="active">
       <!-- Adicione aqui os links da barra de navegação, se necessário -->
       <li class="nav-item">
-        <a class="nav-link" routerLink="/profile">Perfil</a>
-        <a class="nav-link" routerLink="/user-login">Login</a>
+        <a  *ngIf="loggedIn" class="nav-link" routerLink="/profile">Perfil</a>
+        <a *ngIf="!loggedIn" class="nav-link" routerLink="/user-login">Login</a>
+        <a  *ngIf="loggedIn" class="nav-link" routerLink="/logout">Logout</a>
       </li>
     </ul>
   </nav>
 
   <router-outlet></router-outlet>
   
-  <!-- Aqui está o conteúdo que deve ser condicionalmente exibido com base no login -->
-  <div *ngIf="loggedIn">
-    <!-- Adicione aqui a lógica de exibição baseada no login, se necessário -->
-    <!-- Por exemplo, exibir alertas para clientes ou funcionários -->
-  </div>
-</div>
+

@@ -85,30 +85,21 @@ export class RegisterEmployeeComponent implements OnInit {
       this.loggedIn = user != null; 
       if (this.loggedIn) {
         console.log(user.email);
-        this.authService.logIn('JoaoGaspar','JoaoGaspar').subscribe(
-          data => {
-            this.isEmployee();
-           
-            // Chame isClient() aqui
-          },
-          err => {
-            console.log("erro");
-            this.socialAuthService.signOut();
-            this.isSignInFailed = true;
-          }
-        );
+       
+          
         
+    
         console.log("this is client"+this.isAClient)
         this.hideRegistrationForm();
-
+      
       }
       else{
         console.log(this.loggedIn+ "is not loggedin?")
         this.loggedIn=false;
       }
-    });
+    
+    })
   }
-
 isEmployee() {
   console.log("isEmployee acedido");
   if (this.user) {

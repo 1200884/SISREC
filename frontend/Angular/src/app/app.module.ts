@@ -30,6 +30,7 @@ import { AccountSettingsComponent } from './account-settings/account-settings.co
 import { MatButtonModule } from '@angular/material/button';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { FormsModule } from '@angular/forms';
+import { PersonalizedRecommendationsComponent } from './personalized-recommendations/personalized-recommendations.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { FormsModule } from '@angular/forms';
     FavoriteMoviesComponent,
     PastRatingsComponent,
     AccountSettingsComponent,
-    UserLoginComponent
+    UserLoginComponent,
+    PersonalizedRecommendationsComponent
   ],
   imports: [
     BrowserModule,

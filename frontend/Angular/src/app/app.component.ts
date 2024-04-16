@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
   private roles: string[] = [];
   username?: string;
   user: undefined;
-  loggedIn: boolean | undefined;
+  loggedIn: boolean = false;
   isSignInFailed = false;
   isAClient= false;
   isAEmployee=false;
@@ -34,12 +34,7 @@ export class AppComponent implements OnInit {
    
   this.router.navigate(['/board-client']);
     
-    if (this.isAEmployee) {
-      // Navegar para a rota /board-employee
-      console.log("alfrdedo")
-      console.log("------------------------------------------")
-      this.router.navigate(['/board-employee']);
-    }
+  
     if (!this.loggedIn){
       this.router.navigate(['/']);
 
@@ -48,17 +43,10 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.logIn('JoaoGaspar', 'JoaoGaspar').subscribe(
-      data => {
-        console.log('Usuário autenticado com sucesso:', data);
-        // Redirecionar para a página adequada após o login (por exemplo, página do cliente ou do funcionário)
-        // Modifique de acordo com a lógica da sua aplicação
-        this.router.navigate(['/board-client']);
-      },
-      err => {
-        console.error('Erro ao autenticar o usuário:', err);
-      }
-    );
+    this.loggedIn =this.authService.isLoggedIn
+    console.log("bernardo -> "+this.loggedIn)
+    this.router.navigate(['/board-client'])
+   
   
     console.log("ngnOnInit app accessed")
     this.hideRegistrationForm(); // Ocultar o formulário de registro

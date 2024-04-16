@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../_services/auth.service';
+import { Route } from '@angular/router';
+import { Router } from '@angular/router';
+import { AppComponent } from '../app.component';
+
 
 @Component({
   selector: 'app-user-login',
@@ -10,13 +14,26 @@ export class UserLoginComponent {
   email: string = '';
   password: string = '';
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private appcomponent: AppComponent, private router: Router) { }
 
   onSubmit(): void {
-    // Aqui você pode adicionar a lógica para enviar os dados de login para o servidor
     console.log('Email:', this.email);
     console.log('Password:', this.password);
-    this.authService.logIn(this.email, this.password)
-    // Por enquanto, estamos apenas imprimindo os valores do email e senha no console
+    this.authService.logIn(this.email, this.password).subscribe(
+      (isLoggedIn: boolean) => {
+        if (this.authService.isLoggedIn) {
+          console.log("is Logged In")
+          this.appcomponent.loggedIn=true;
+          this.router.navigate(['/personalized-recommendations']);
+        } else {
+          console.log("is Not Logged In")
+          console.error('O login falhou');
+        }
+      },
+      (error) => {
+        console.error('Erro ao fazer login:', error);
+      }
+    );
+    
   }
-}
+}  
