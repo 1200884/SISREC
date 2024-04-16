@@ -1,7 +1,7 @@
 import uvicorn
 from database import *
 from fastapi import FastAPI
-from routes import checkRouter, userRouter,genresRouter, recommendationRouter
+from routes import checkRouter, userRouter,genresRouter, recommendationRouter, moviesRouter
 from models import *
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -20,6 +20,7 @@ app.include_router(checkRouter.router)
 app.include_router(userRouter.router)
 app.include_router(genresRouter.router)
 app.include_router(recommendationRouter.router)
+app.include_router(moviesRouter.router)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", port=5000, log_level="info")
+    uvicorn.run("main:app", reload=True, port=5000, log_level="info")
