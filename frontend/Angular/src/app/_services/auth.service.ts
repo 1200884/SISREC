@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { User } from 'src/app/_models/User';
 import { Subscription } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -48,12 +49,33 @@ export class AuthService {
   register(user: User | undefined): Observable<User> {
     return this.http.post<User>(environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL + "/signup", user);
   }
-  logIn(username: string, password: string): Observable<Boolean> {
-    if (username === 'JoaoGaspar' && password === 'JoaoGaspar') {
-      return of(true);
+  logIn(email: string, password: string): Observable<any> {
+    if (email === 'JoaoGaspar' && password === 'JoaoGaspar') {
+      console.log("Nelson");
+      return of(true); 
+    } else {
+      console.log("email ->"+email);
+      console.log("password ->" +password);
+      console.log("Grande Nelson");
+      return new Observable(observer => {
+        this.http.post(environment.BACKEND_URL_LOCAL + environment.LOGIN_URL, { email, password })
+          .subscribe(
+            (response: any) => {
+              console.log('Resposta do backend:', response);
+              observer.next(true); 
+              observer.complete();
+            },
+            (error) => {
+              console.error('Erro ao fazer login:', error);
+              observer.next(false);
+              observer.complete();
+            }
+          );
+      });
     }
-    else return this.http.post<Boolean>(environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL, { username, password });
   }
+
+  
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL);
   }

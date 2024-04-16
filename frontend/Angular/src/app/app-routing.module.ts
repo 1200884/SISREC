@@ -18,6 +18,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { PastRatingsComponent } from './past-ratings/past-ratings.component';
 import { FavoriteMoviesComponent } from './favorite-movies/favorite-movies.component';
 import { AccountSettingsComponent } from './account-settings/account-settings.component';
+import { UserLoginComponent } from './user-login/user-login.component';
 const routes: Routes = [
   //{ path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'users', component: GetUsersComponent },
@@ -36,7 +37,8 @@ const routes: Routes = [
   { path: 'profile', component: ProfileComponent },
   { path: 'past-ratings', component: PastRatingsComponent },
   { path: 'favorite-movies', component: FavoriteMoviesComponent },
-  {path: 'account-settings', component: AccountSettingsComponent}
+  {path: 'account-settings', component: AccountSettingsComponent},
+  {path: 'user-login', component: UserLoginComponent}
   //{ path: 'login/callback', component: OktaCallbackComponent },
 ];
 

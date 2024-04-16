@@ -28,6 +28,8 @@ import { PastRatingsComponent } from './past-ratings/past-ratings.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { AccountSettingsComponent } from './account-settings/account-settings.component';
 import { MatButtonModule } from '@angular/material/button';
+import { UserLoginComponent } from './user-login/user-login.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -48,7 +50,8 @@ import { MatButtonModule } from '@angular/material/button';
     ProfileComponent,
     FavoriteMoviesComponent,
     PastRatingsComponent,
-    AccountSettingsComponent
+    AccountSettingsComponent,
+    UserLoginComponent
   ],
   imports: [
     BrowserModule,
@@ -60,7 +63,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatDialogModule,
     MatFormFieldModule,
     MatButtonModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule
   ],
   providers: [authInterceptorProviders],
   bootstrap: [AppComponent] // Adicione o AppComponent ao array bootstrap

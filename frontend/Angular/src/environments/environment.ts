@@ -13,6 +13,7 @@ export const environment = {
   APPOINTMENTS_URL: "/appointment",
   AUTH_URL: "/auth",
   PLACES_URL: "/place",
+  LOGIN_URL: "/users/login"
 };
 
 /*
