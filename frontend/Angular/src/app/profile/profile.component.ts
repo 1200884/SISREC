@@ -12,7 +12,7 @@ export class ProfileComponent {
 
   futureAppointments() {
     // Redirecionar para a página de registro de funcionários
-    this.router.navigate(['/future-appointments']);
+    this.router.navigate(['/favorite-movies']);
   }
   pastRatings() {
     // Redirecionar para a página de registro de funcionários
