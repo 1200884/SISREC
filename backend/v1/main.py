@@ -5,6 +5,7 @@ from routes import checkRouter, userRouter,genresRouter, recommendationRouter, m
 from models import *
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
+from fastapi.middleware.cors import CORSMiddleware
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -15,6 +16,16 @@ async def lifespan(app:FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(checkRouter.router)
 app.include_router(userRouter.router)
