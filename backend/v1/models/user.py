@@ -8,13 +8,12 @@ class User(SQLModel, table=True):
     name: str
     email: str
     password: str
-    genres: List[str] = Field(sa_column=Column(JSON))
+    genres: Optional[List[str]] = Field(sa_column=Column(JSON))
 
 class UserCreate(SQLModel):
     name: str
     email: str
     password: str
-    genres: List[str]
 
 
 class UserUpdate(SQLModel):

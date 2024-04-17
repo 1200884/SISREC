@@ -22,7 +22,7 @@ async def createUser(*, session: AsyncSession = Depends(get_db), userCreate: Use
         lastUserIdPlusOne = 200000
     else:
         lastUserIdPlusOne = lastUser.id + 1
-    db_user = User(id=lastUserIdPlusOne,name=userCreate.name, email=userCreate.email, password=userCreate.password, genres=userCreate.genres)
+    db_user = User(id=lastUserIdPlusOne,name=userCreate.name, email=userCreate.email, password=userCreate.password, genres=[])
     session.add(db_user)
     await session.commit()
     await session.refresh(db_user)
