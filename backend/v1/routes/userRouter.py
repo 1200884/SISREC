@@ -28,7 +28,7 @@ async def createUser(*, session: AsyncSession = Depends(get_db), userCreate: Use
     await session.refresh(db_user)
     return db_user
 
-@router.post("/genres", summary="Add genres to a user")
+@router.post("/genres/{email}", summary="Add genres to a user")
 async def addGenresToUser(*, session: AsyncSession = Depends(get_db), email: str, genres: List[str]):
     query = select(User).where(User.email == email)
     # Change genres to the user
