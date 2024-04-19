@@ -4,6 +4,7 @@ import { AuthService } from '../_services/auth.service';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import {SocialAuthService,SocialUser} from '@abacritt/angularx-social-login';
+import { UserRegister } from '../_models/UserRegister';
 @Component({
   selector: 'app-register-employee',
   templateUrl: './register-employee.component.html',
@@ -48,7 +49,7 @@ export class RegisterEmployeeComponent implements OnInit {
     this.form.role= "employee"
     console.log("employee registado role é " +this.form.role)
     console.log()
-    let user : User;
+    let user : UserRegister;
     user = this.form;
     this.errorMessage='';
     this.authService.register(user).subscribe(
@@ -58,7 +59,7 @@ export class RegisterEmployeeComponent implements OnInit {
         this.isSignUpFailed = false;
         this.errorMessage = "Utilizador criado com sucesso.";
  
-      },
+      },  
       (err) => {
         if (err.status === 402) {
           this.errorMessage = 'O e-mail ou o número de telemóvel já estão associados a uma conta existente.';

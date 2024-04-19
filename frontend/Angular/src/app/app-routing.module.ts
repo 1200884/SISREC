@@ -20,6 +20,7 @@ import { FavoriteMoviesComponent } from './favorite-movies/favorite-movies.compo
 import { AccountSettingsComponent } from './account-settings/account-settings.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { PersonalizedRecommendationsComponent } from './personalized-recommendations/personalized-recommendations.component';
+import { FavoriteGenresComponent } from './favorite-genres/favorite-genres.component';
 const routes: Routes = [
   //{ path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'users', component: GetUsersComponent },
@@ -40,7 +41,8 @@ const routes: Routes = [
   { path: 'favorite-movies', component: FavoriteMoviesComponent },
   {path: 'account-settings', component: AccountSettingsComponent},
   {path: 'user-login', component: UserLoginComponent},
-  {path: 'personalized-recommendations', component: PersonalizedRecommendationsComponent}
+  {path: 'personalized-recommendations', component: PersonalizedRecommendationsComponent},
+  {path: 'favorite-genres', component: FavoriteGenresComponent}
   //{ path: 'login/callback', component: OktaCallbackComponent },
 ];
 

@@ -31,6 +31,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { FormsModule } from '@angular/forms';
 import { PersonalizedRecommendationsComponent } from './personalized-recommendations/personalized-recommendations.component';
+import { FavoriteGenresComponent } from './favorite-genres/favorite-genres.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import { PersonalizedRecommendationsComponent } from './personalized-recommendat
     PastRatingsComponent,
     AccountSettingsComponent,
     UserLoginComponent,
-    PersonalizedRecommendationsComponent
+    PersonalizedRecommendationsComponent,
+    FavoriteGenresComponent
   ],
   imports: [
     BrowserModule,

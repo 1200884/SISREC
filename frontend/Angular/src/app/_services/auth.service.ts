@@ -5,6 +5,8 @@ import { environment } from 'src/environments/environment';
 import { User } from 'src/app/_models/User';
 import { Subscription } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { UserRegister } from '../_models/UserRegister';
+import { UserLoginComponent } from '../user-login/user-login.component';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -20,10 +22,14 @@ export class AuthService {
   private phoneNumber: string = '';
   public isLoggedIn: boolean = false;
   private subscription: Subscription = new Subscription(); // Inicialize a propriedade 'subscription'
-
+  newuseremail:string ='';
   setUserEmail(email: string) {
     console.log("setuser email true")
     this.userEmail = email;
+  }
+  setNewUserEmail(email: string) {
+    console.log("setuser email true")
+    this.newuseremail = email;
   }
   setName(name: string) {
     console.log("name = " + name);
@@ -40,34 +46,46 @@ export class AuthService {
   getUserEmail(): string {
     return this.userEmail;
   }
+  getNewUserEmail(): string {
+    return this.newuseremail;
+  }
   getPhoneNumber(): string {
     console.log("get phone number -> " + this.phoneNumber)
     return this.phoneNumber;
   }
-  register(user: User | undefined): Observable<User> {
-    return this.http.post<User>(environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL + "/signup", user);
+  registerGenres(selectedGenres: any[]): Observable<boolean> {
+    
+    console.log("email ->"+ this.newuseremail)
+    return this.http.post<boolean>(environment.BACKEND_URL_LOCAL + environment.USERSGENRES_URL+"/"+this.newuseremail,  selectedGenres);
+  }
+  register(userRegister: UserRegister | undefined): Observable<boolean> {
+    return this.http.post<UserRegister>(environment.BACKEND_URL_LOCAL + environment.USERS_URL, userRegister).pipe(
+      map((response: any) => {
+        return response.status === 200; // Retorna true se o status for 200
+      }),
+    );
   }
   logIn(email: string, password: string): Observable<boolean> {
     const body = { email, password };
 
     if (email === 'JoaoGaspar' && password === 'JoaoGaspar') {
-      console.log("Nelson - Usuário localmente autenticado");
-      return of(true); // Retorna true para indicar um login bem-sucedido localmente
+      console.log("Nelson");
+      return of(true); 
     } else {
       console.log("email -> " + email);
       console.log("password -> " + password);
-      console.log("Grande Nelson - Fazendo chamada para o backend");
+      console.log("Grande Nelson");
 
       return this.http.post<any>(environment.BACKEND_URL_LOCAL + environment.LOGIN_URL, body)
         .pipe(
           map((response: any) => {
             console.log('Resposta do backend:', response);
             this.isLoggedIn=true;
-            return response.status === 200; // Retorna true se o status for 200, indicando login bem-sucedido
+            return response.status === 200; 
           }),
           catchError(error => {
             console.error('Erro ao fazer login:', error);
-            return of(false); // Retorna false em caso de erro na chamada para o backend
+            return of(false);
           })
         );
     }

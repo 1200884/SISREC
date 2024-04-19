@@ -24,6 +24,7 @@ export class UserLoginComponent {
         if (this.authService.isLoggedIn) {
           console.log("is Logged In")
           this.appcomponent.loggedIn=true;
+          this.authService.setUserEmail(this.email)
           this.router.navigate(['/personalized-recommendations']);
         } else {
           console.log("is Not Logged In")
@@ -34,6 +35,5 @@ export class UserLoginComponent {
         console.error('Erro ao fazer login:', error);
       }
     );
-    
   }
 }  
