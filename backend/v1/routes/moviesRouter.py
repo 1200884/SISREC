@@ -13,11 +13,11 @@ from random import randint
 
 router = APIRouter(prefix='/movies', tags=['Movies'])
 
-@router.get("/search", summary="Search movie")
-async def getMovie(*, title:str, year:int):
+@router.get("/search/{title}", summary="Search movie")
+async def getMovie(*, title:str):
     script_dir = os.path.dirname(__file__)
     df_movies = pd.read_csv(os.path.join(script_dir, '../recommender/dataset/movies.csv'))
-    result = df_movies[df_movies['title'].str.contains(title) & (df_movies['year'] == year)]
+    result = df_movies[df_movies['title'].str.contains(title)]
     json = result.reset_index().to_dict(orient='records')
     return JSONResponse(content=json)
 
