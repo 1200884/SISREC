@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { UserRegister } from '../_models/UserRegister';
 import { UserLoginComponent } from '../user-login/user-login.component';
+import { Movie } from '../_models/Movie';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -95,7 +96,10 @@ export class AuthService {
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL);
   }
-
+  getMoviesNonPersonalized():Observable<Movie[]>
+  {
+    return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONSNONPERSONALIZED);
+  }
 
   isClient(email: string): Observable<boolean> {
     return this.http.get<boolean>(environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL + "/isclient/" + email);

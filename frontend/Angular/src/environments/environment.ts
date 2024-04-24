@@ -15,7 +15,8 @@ export const environment = {
   PLACES_URL: "/place",
   USERS_URL: "/users",
   USERSGENRES_URL:"/users/genres",
-  LOGIN_URL: "/users/login"
+  LOGIN_URL: "/users/login",
+  RECOMMENDATIONSNONPERSONALIZED: "/recommendation/nonpersonalized"
 };
 
 /*

@@ -1,32 +1,34 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../_services/auth.service';
+import { Movie } from '../_models/Movie';
 
 @Component({
   selector: 'app-board-client',
   templateUrl: './board-client.component.html',
   styleUrls: ['./board-client.component.css']
 })
-export class BoardClientComponent {
-  constructor(private router: Router) {}
+export class BoardClientComponent implements OnInit {
 
-  solarios() {
-    // Redirecionar para a página de registro de funcionários
-    this.router.navigate(['/solarios']);
-  }
+  constructor(private router: Router, private authService: AuthService) {}
 
-  barbearias() {
-    // Redirecionar para a página de visualização de reservas
-    this.router.navigate(['/barbeiros']);
-  }
-  
-  cabeleireiros(){
-    this.router.navigate(['/cabeleireiros'])
+  movies: Movie[] = [];
+
+  ngOnInit() {
+    // Chamar o método para obter as recomendações de filmes no momento da inicialização do componente
+    this.getNonPersonalizedRecommendations();
   }
 
-  esteticistas(){
-    this.router.navigate(['/esteticistas'])
-  }
-  favoritos(){
-    this.router.navigate(['/favoritos'])
+  getNonPersonalizedRecommendations() {
+    // Chamar o método do serviço para obter as recomendações de filmes não personalizadas
+    this.authService.getMoviesNonPersonalized().subscribe(
+      (movies: Movie[]) => {
+        // Atribuir os resultados ao array de filmes
+        this.movies = movies;
+      },
+      (error) => {
+        console.error('Erro ao obter as recomendações de filmes:', error);
+      }
+    );
   }
 }
