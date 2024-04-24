@@ -15,9 +15,10 @@ router = APIRouter(prefix='/movies', tags=['Movies'])
 
 @router.get("/search/{title}", summary="Search movie")
 async def getMovie(*, title:str):
+    titleAlt = title.lower()
     script_dir = os.path.dirname(__file__)
     df_movies = pd.read_csv(os.path.join(script_dir, '../recommender/dataset/movies.csv'))
-    result = df_movies[df_movies['title'].str.contains(title)]
+    result = df_movies[df_movies['title'].str.contains(titleAlt)]
     json = result.reset_index().to_dict(orient='records')
     return JSONResponse(content=json)
 
