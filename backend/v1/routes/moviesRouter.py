@@ -14,19 +14,16 @@ from random import randint
 router = APIRouter(prefix='/movies', tags=['Movies'])
 
 @router.get("/search/{title}", summary="Search movie")
-async def getMovie(title: str):
+async def getMovie(*, session: AsyncSession = Depends(get_db), title: str):
     titleAlt = title.lower()
-    script_dir = os.path.dirname(__file__)
-    df_movies = pd.read_csv(os.path.join(script_dir, '../utils/movies_full.csv'))
-    result = df_movies[df_movies['titleLower'].str.contains(titleAlt)]
-    json = result.head(5).reset_index().to_dict(orient='records')
-    return JSONResponse(content=json)
+    query = select(Movie).where(Movie.titleLower.contains(titleAlt)).limit(5)
+    movies = await session.execute(query)
+    allMovies = movies.scalars().all()
+    return allMovies
 
 @router.get("/randomMovie", summary="Returns random movie")
-async def getRandomMovie():
-    script_dir = os.path.dirname(__file__)
-    df_movies = pd.read_csv(os.path.join(script_dir, '../utils/movies_full.csv'))
-    number = randint(0, df_movies.shape[0])
-    result = df_movies[df_movies.index == number]
-    json = result.reset_index().to_dict(orient='records')
-    return JSONResponse(content=json)
+async def getRandomMovie(*, session: AsyncSession = Depends(get_db)):
+    number = randint(0, 62423)
+    print(f" Number that has selected :{number}")
+    movie = await session.get(Movie, number)
+    return movie
