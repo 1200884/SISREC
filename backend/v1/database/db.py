@@ -4,7 +4,7 @@ import os
 from sqlmodel import SQLModel
 load_dotenv()
 
-engine = create_async_engine(os.getenv('DATABASE_URL'),  echo=True, future=True)
+engine = create_async_engine(os.getenv('DATABASE_URL_TEST'),  echo=True, future=True)
 SessionLocal = async_sessionmaker(engine)
 
 async def get_db():
