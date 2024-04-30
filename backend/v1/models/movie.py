@@ -5,7 +5,7 @@ from sqlalchemy import Column, String
 
 class Movie(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    movieId: int
+    movieid: int
     title: str
     titleLower: str
     genres: str
