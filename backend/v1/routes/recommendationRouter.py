@@ -12,14 +12,14 @@ async def nonPersonalised():
     path = os.path.join(script_dir, '../utils/NonPersonalized.json')
     if os.stat(path).st_size == 0:
         df_rating = pd.read_csv(os.path.join(script_dir, '../recommender/dataset/ratings.csv'))
-        df_movie = pd.read_csv(os.path.join(script_dir,'../recommender/dataset/movies.csv'))
+        df_movie = pd.read_csv(os.path.join(script_dir,'../utils/movies_full.csv'))
 
         df_rating = df_rating[['movieId', 'rating']]
-        df_movie = df_movie[['movieId', 'title']]
+        #df_movie = df_movie[['movieId', 'title']]
 
         grouped_df = (
-            pd.merge(df_rating, df_movie, on='movieId', copy=False)
-            .groupby(['movieId', 'title'])
+            pd.merge(df_rating, df_movie, on='movieId')
+            .groupby(['movieId', 'title', 'genres', 'imdbId', 'year', 'url','titleLower'])
             .agg(count=('rating', 'count'), mean=('rating', 'mean'))
         )
 
@@ -32,6 +32,8 @@ async def nonPersonalised():
         sorted_df = grouped_df.sort_values(by='weighted_rating', ascending=False)
     
         json_result = sorted_df.head(5).reset_index().to_dict(orient='records')
+        with open(path, "w") as file:
+            json.dump(json_result, file)
     
         return JSONResponse(content=json_result)
     else:
@@ -45,20 +47,17 @@ def nonPersonalizedToFile():
     path = os.path.join(script_dir, '../utils/NonPersonalized.json')
     try:
         f = open(path, "x")
-    except:
-        print("File already exists")
-    finally:
         with open(path, "w") as file:
             script_dir = os.path.dirname(__file__)
             df_rating = pd.read_csv(os.path.join(script_dir, '../recommender/dataset/ratings.csv'))
-            df_movie = pd.read_csv(os.path.join(script_dir,'../recommender/dataset/movies.csv'))
+            df_movie = pd.read_csv(os.path.join(script_dir,'../utils/movies_full.csv'))
 
             df_rating = df_rating[['movieId', 'rating']]
-            df_movie = df_movie[['movieId', 'title']]
+            #df_movie = df_movie[['movieId', 'title']]
 
             grouped_df = (
-            pd.merge(df_rating, df_movie, on='movieId', copy=False)
-            .groupby(['movieId', 'title'])
+            pd.merge(df_rating, df_movie, on='movieId')
+            .groupby(['movieId', 'title', 'genres', 'imdbId', 'year', 'url','titleLower'])
             .agg(count=('rating', 'count'), mean=('rating', 'mean'))
             )
 
@@ -72,4 +71,5 @@ def nonPersonalizedToFile():
     
             json_result = sorted_df.head(5).reset_index().to_dict(orient='records')
             json.dump(json_result, file)
-
+    except:
+        print("File already exists")
