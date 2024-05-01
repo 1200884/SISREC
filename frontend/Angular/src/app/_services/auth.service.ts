@@ -100,6 +100,8 @@ export class AuthService {
   {
     return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONSNONPERSONALIZED);
   }
+  getPersonalizedMovies(searchquery:string):Observable<Movie[]>
+  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.MOVIESSEARCH+searchquery)}
 
   isClient(email: string): Observable<boolean> {
     return this.http.get<boolean>(environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL + "/isclient/" + email);
