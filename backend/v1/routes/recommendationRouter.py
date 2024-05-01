@@ -15,34 +15,28 @@ async def nonPersonalised():
     script_dir = os.path.dirname(__file__)
     path = os.path.join(script_dir, '../utils/NonPersonalized.json')
     if os.stat(path).st_size == 0:
-        sql_query = """
-            SELECT 
-                movieid, 
-                title, 
-                genres,
-                year,
-                url,
-                COUNT(stars) AS count, 
-                AVG(stars) AS mean,
-                (
-                    (COUNT(stars) / (COUNT(stars) + 1000)) * AVG(stars) +
-                    (1000 / (COUNT(stars) + 1000)) * AVG(stars)
-                ) AS weighted_rating
+        df = pd.read_sql_query("""SELECT 
+            m.movieid,
+            m.title,
+            m.genres,
+            m.imdbid,
+            m.year,
+            m.url,
+            m.titlelower,
+            COUNT(r.stars) AS count,
+            AVG(r.stars) AS mean
             FROM 
-                rating a
+                movie m
             JOIN 
-                movie b
-            ON 
-                a.movie_id = b.movieid
+                rating r ON m.movieid = r.movie_id
             GROUP BY 
-                movieid, title, genres, year, url
-            ORDER BY 
-                weighted_rating DESC
-        """
+                m.movieid, m.title, m.genres, m.imdbid, m.year, m.url, m.titlelower""", con=engine)
+        m = 1000
+        df['weighted_rating'] = ((df['count'] / (df['count'] + m)) * df['mean'] +(m / (df['count'] + m)) * df['mean'].mean())
 
-        grouped_df = pd.read_sql_query(sql_query, con=engine)
-    
-        json_result = grouped_df.head(5).reset_index().to_dict(orient='records')
+
+        sorted_df = df.sort_values(by='weighted_rating', ascending=False)
+        json_result = sorted_df.head(5).reset_index().to_dict(orient='records')
         with open(path, "w") as file:
             json.dump(json_result, file)
     
@@ -59,34 +53,28 @@ def nonPersonalizedToFile():
     try:
         f = open(path, "x")
         with open(path, "w") as file:
-            sql_query = """
-                SELECT 
-                    movieid, 
-                    title, 
-                    genres, 
-                    year,
-                    url,
-                    COUNT(stars) AS count, 
-                    AVG(stars) AS mean,
-                    (
-                        (COUNT(stars) / (COUNT(stars) + 1000)) * AVG(stars) +
-                        (1000 / (COUNT(stars) + 1000)) * AVG(stars)
-                    ) AS weighted_rating
-                FROM 
-                    rating a
-                JOIN 
-                    movie b
-                ON 
-                    a.movie_id = b.movieid
-                GROUP BY 
-                    movieid, title, genres, year, url
-                ORDER BY 
-                    weighted_rating DESC
-            """
+            df = pd.read_sql_query("""SELECT 
+            m.movieid,
+            m.title,
+            m.genres,
+            m.imdbid,
+            m.year,
+            m.url,
+            m.titlelower,
+            COUNT(r.stars) AS count,
+            AVG(r.stars) AS mean
+            FROM 
+                movie m
+            JOIN 
+                rating r ON m.movieid = r.movie_id
+            GROUP BY 
+                m.movieid, m.title, m.genres, m.imdbid, m.year, m.url, m.titlelower""", con=engine)
+            m = 1000
+            df['weighted_rating'] = ((df['count'] / (df['count'] + m)) * df['mean'] +(m / (df['count'] + m)) * df['mean'].mean())
 
-            grouped_df = pd.read_sql_query(sql_query, con=engine)
-    
-            json_result = grouped_df.head(5).reset_index().to_dict(orient='records')
+
+            sorted_df = df.sort_values(by='weighted_rating', ascending=False)
+            json_result = sorted_df.head(5).reset_index().to_dict(orient='records')
             json.dump(json_result, file)
     except:
         print("File already exists")
