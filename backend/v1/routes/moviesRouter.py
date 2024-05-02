@@ -16,7 +16,7 @@ router = APIRouter(prefix='/movies', tags=['Movies'])
 @router.get("/search/{title}", summary="Search movie")
 async def getMovie(*, session: AsyncSession = Depends(get_db), title: str):
     titleAlt = title.lower()
-    query = select(Movie).where(Movie.titleLower.contains(titleAlt)).limit(5)
+    query = select(Movie).where(Movie.titlelower.contains(titleAlt)).limit(5)
     movies = await session.execute(query)
     allMovies = movies.scalars().all()
     return allMovies
