@@ -13,6 +13,11 @@ router = APIRouter(prefix='/ratings', tags=['Ratings'])
 
 @router.post("/", summary="Create a rating")
 async def createRating(*, session: AsyncSession = Depends(get_db), ratingCreate: RatingCreate):
+    query = select(Rating).where(Rating.user_id == ratingCreate.user_id).where(Rating.movie_id == ratingCreate.movie_id)
+    result = await session.execute(query)
+    rating = result.scalars().first()
+    if rating:
+        raise HTTPException(status_code=404, detail="Rating already exists for this user and movie")
     current_timestamp = time()
     intCurrent = int(current_timestamp)
     db_rating = Rating(user_id=ratingCreate.user_id, movie_id=ratingCreate.movie_id, stars=ratingCreate.stars, timestamp=intCurrent)
@@ -21,9 +26,18 @@ async def createRating(*, session: AsyncSession = Depends(get_db), ratingCreate:
     await session.refresh(db_rating)
     return db_rating
 
-@router.get("/{userid}", summary="Create a rating")
-async def createRating(*, session: AsyncSession = Depends(get_db), userid: int):
+@router.get("/history/{userid}", summary="Get last 5 ratings of a user")
+async def getRatings(*, session: AsyncSession = Depends(get_db), userid: int):
     query = select(Rating).where(Rating.user_id == userid).order_by(desc(Rating.timestamp)).limit(5)
+    result = await session.execute(query)
+    ratings = result.scalars().all()
+    if not ratings:
+        raise HTTPException(status_code=404, detail="Ratings not found")
+    return ratings
+
+@router.get("/favoriteMovies/{userid}", summary="Get favorite movies of a user")
+async def favoriteMovie(*, session: AsyncSession = Depends(get_db), userid: int):
+    query = select(Rating).where(Rating.user_id == userid).order_by(desc(Rating.stars)).order_by(desc(Rating.timestamp)).limit(5)
     result = await session.execute(query)
     ratings = result.scalars().all()
     if not ratings:
