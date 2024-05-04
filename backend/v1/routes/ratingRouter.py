@@ -26,6 +26,16 @@ async def createRating(*, session: AsyncSession = Depends(get_db), ratingCreate:
     await session.refresh(db_rating)
     return db_rating
 
+@router.get("/", summary="Get a rating by user and movie")
+async def getRating(*, session: AsyncSession = Depends(get_db), user_id: int, movie_id: int):
+    query = select(Rating).where(Rating.user_id == user_id).where(Rating.movie_id == movie_id)
+    result = await session.execute(query)
+    rating = result.scalars().first()
+    if not rating:
+        raise HTTPException(status_code=404, detail="Rating not found")
+    else:
+        return rating
+
 @router.get("/history/{userid}", summary="Get last 5 ratings of a user")
 async def getRatings(*, session: AsyncSession = Depends(get_db), userid: int):
     query = select(Rating).where(Rating.user_id == userid).order_by(desc(Rating.timestamp)).limit(5)
