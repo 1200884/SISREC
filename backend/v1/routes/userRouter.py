@@ -50,7 +50,7 @@ async def loginUser(*, session: AsyncSession = Depends(get_db), userLogin: UserL
     if not user:
         raise HTTPException(status_code=404, detail="User not found or login credencials are wrong")
     else:
-        return {"status": "Verified", "user": user.id}
+        return {"status": "Verified", "userId": user.id}
 
 @router.get("/{id}", response_model=UserRead, summary="Get user by id")
 async def getUserByID(*, session: AsyncSession = Depends(get_db), id: int):
