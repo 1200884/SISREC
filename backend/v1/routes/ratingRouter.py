@@ -20,3 +20,13 @@ async def createRating(*, session: AsyncSession = Depends(get_db), ratingCreate:
     await session.commit()
     await session.refresh(db_rating)
     return db_rating
+
+@router.get("/{userid}", summary="Create a rating")
+async def createRating(*, session: AsyncSession = Depends(get_db), userid: int):
+    query = select(Rating).where(Rating.user_id == userid).order_by(desc(Rating.timestamp)).limit(5)
+    result = await session.execute(query)
+    ratings = result.scalars().all()
+    if not ratings:
+        raise HTTPException(status_code=404, detail="Ratings not found")
+    return ratings
+
