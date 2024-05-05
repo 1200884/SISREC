@@ -1,6 +1,5 @@
-from sqlmodel import Field, SQLModel, JSON
-from typing import Optional, List
-from sqlalchemy import Column, String
+from sqlmodel import Field, SQLModel
+from typing import Optional
 
 
 class Movie(SQLModel, table=True):

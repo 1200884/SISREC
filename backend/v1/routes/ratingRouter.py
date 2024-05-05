@@ -4,10 +4,9 @@ from database import *
 from typing import List
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import select, text
 from sqlalchemy import desc
 from time import time
-import pandas as pd
 
 router = APIRouter(prefix='/ratings', tags=['Ratings'])
 
@@ -43,14 +42,38 @@ async def getRatings(*, session: AsyncSession = Depends(get_db), userid: int):
     ratings = result.scalars().all()
     if not ratings:
         raise HTTPException(status_code=404, detail="Ratings not found")
-    return ratings
+    ratingList = list_rating_to_list_rating_return(ratings)
+    for rating in ratingList:
+        query = select(Movie).where(Movie.movieid == rating.movie_id)
+        result = await session.execute(query)
+        ratingQuery = result.scalars().first()
+        rating.titleMovie = ratingQuery.title
+        rating.genresMovie = ratingQuery.genres
+        rating.imdbidMovie = ratingQuery.imdbid
+        rating.yearMovie = ratingQuery.year
+        rating.urlMovie = ratingQuery.url
+    return ratingList
 
 @router.get("/favoriteMovies/{userid}", summary="Get favorite movies of a user")
 async def favoriteMovie(*, session: AsyncSession = Depends(get_db), userid: int):
-    query = select(Rating).where(Rating.user_id == userid).order_by(desc(Rating.stars)).order_by(desc(Rating.timestamp)).limit(5)
+    query = select(Rating, Movie).join(Movie).where(Rating.user_id == userid).order_by(desc(Rating.stars)).order_by(desc(Rating.timestamp)).limit(5)
     result = await session.execute(query)
+    print(result)
     ratings = result.scalars().all()
     if not ratings:
         raise HTTPException(status_code=404, detail="Ratings not found")
-    return ratings
+    # From Ratings to RatingReturn
+    ratingList = list_rating_to_list_rating_return(ratings)
+    print(ratingList)
+    for rating in ratingList:
+        query = select(Movie).where(Movie.movieid == rating.movie_id)
+        result = await session.execute(query)
+        ratingQuery = result.scalars().first()
+        rating.titleMovie = ratingQuery.title
+        rating.genresMovie = ratingQuery.genres
+        rating.imdbidMovie = ratingQuery.imdbid
+        rating.yearMovie = ratingQuery.year
+        rating.urlMovie = ratingQuery.url
+
+    return ratingList
 
