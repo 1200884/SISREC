@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { User } from 'src/app/_models/User';
 import { Subscription } from 'rxjs';
@@ -18,15 +18,20 @@ const httpOptions = {
 })
 export class AuthService {
   constructor(private http: HttpClient) { }
+  private userid: number =0;  
   private userEmail: string = '';
   private name: string = '';
   private phoneNumber: string = '';
   public isLoggedIn: boolean = false;
-  private subscription: Subscription = new Subscription(); // Inicialize a propriedade 'subscription'
+  private subscription: Subscription = new Subscription(); 
+
   newuseremail:string ='';
   setUserEmail(email: string) {
     console.log("setuser email true")
     this.userEmail = email;
+  }
+  setUserId(userid: number){
+    this.userid=userid;
   }
   setNewUserEmail(email: string) {
     console.log("setuser email true")
@@ -53,6 +58,9 @@ export class AuthService {
   getPhoneNumber(): string {
     console.log("get phone number -> " + this.phoneNumber)
     return this.phoneNumber;
+  }
+  getUserId():number{
+    return this.userid;
   }
   registerGenres(selectedGenres: any[]): Observable<boolean> {
     
@@ -81,6 +89,8 @@ export class AuthService {
         .pipe(
           map((response: any) => {
             console.log('Resposta do backend:', response);
+            this.userid=response.user;
+            console.log("user id ->" + this.userid)
             this.isLoggedIn=true;
             return response.status === 200; 
           }),
@@ -91,7 +101,27 @@ export class AuthService {
         );
     }
   }
-  
+  rate(stars: number, movie_id: number): Observable<boolean> {
+    console.log("stars ->"+stars)
+    console.log("movie_id->"+ movie_id)
+    const user_id =this.userid
+    console.log("user_id ->->"  + user_id)
+    const body = {user_id,movie_id,stars}
+    
+    
+    return this.http.post<any>(environment.BACKEND_URL_LOCAL + environment.RATINGS_URL, body).pipe(
+      map((response: any) => {
+        console.log("nelson ")
+        return response.status === 200;
+      }),
+      catchError(error => {
+        console.error('Erro ao enviar classificação:', error);
+        return throwError(error);
+      })
+    );
+  }
+ 
+
   
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL);

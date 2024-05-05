@@ -17,6 +17,7 @@ export class PersonalizedRecommendationsComponent {
   error: string | null = null;
   rating: number = 0;
   selectedMovie: Movie | null = null; // Inicializando como null
+  idMovie=this.selectedMovie?.id;
   constructor(private http: HttpClient, private authservice:AuthService) {}
 
   searchMovies() {
@@ -56,10 +57,33 @@ export class PersonalizedRecommendationsComponent {
     this.selectedMovie = movie; // Atualizando o selectedMovie com o filme selecionado
     console.log(this.selectedMovie?.url)
   }
-rateMovie(stars: number) {
-  this.rating = stars;
-  console.log("stras-> "+stars)
-}
+  rateMovie(stars: number, movieId: number) {
+    this.rating = stars;
+    console.log(this.idMovie)
+    console.log(this.selectedMovie?.id)
+    console.log("Estrelas -> " + stars);
+    this.authservice.rate(stars, movieId).subscribe(
+      (result) => {
+        if (result) {
+          console.log(result)
+          console.log('Classificação enviada com sucesso!');
+          // Faça algo aqui se a classificação for enviada com sucesso
+        } else {
+          console.error('Erro ao enviar classificação.');
+          // Faça algo aqui se houver um erro ao enviar a classificação
+        }
+      },
+      (error) => {
+        console.error('Erro ao enviar classificação:', error);
+        // Faça algo aqui se houver um erro na solicitação HTTP
+      },
+      () => {
+        console.log('A solicitação de classificação foi concluída.');
+        // Faça algo aqui após a conclusão da solicitação HTTP (opcional)
+      }
+    );
+  }
+  
   openDropdown() {
     this.isDropdownOpen = true;
   }

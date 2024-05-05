@@ -17,7 +17,8 @@ export const environment = {
   USERSGENRES_URL:"/users/genres",
   LOGIN_URL: "/users/login",
   RECOMMENDATIONSNONPERSONALIZED: "/recommendation/nonpersonalized",
-  MOVIESSEARCH:"/movies/search/"
+  MOVIESSEARCH:"/movies/search/",
+  RATINGS_URL:"/ratings/"
 };
 
 /*

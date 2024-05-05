@@ -1,10 +1,13 @@
 <div *ngIf="movies.length > 0; else noMovies">
   <h2>Filmes Recomendados</h2>
-  <ul>
-    <li *ngFor="let movie of movies">
-      <strong>Título:</strong> {{ movie.title }} <br>
-    </li>
-  </ul>
+  <div class="movie-list">
+    <div *ngFor="let movie of movies" class="movie-item">
+      <div class="movie-content">
+        <img [src]="movie.url" alt="Capa do Filme" class="movie-image">
+        <div class="movie-title">{{ movie.title }}</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <ng-template #noMovies>
