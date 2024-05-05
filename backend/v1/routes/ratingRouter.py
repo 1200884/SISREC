@@ -56,15 +56,13 @@ async def getRatings(*, session: AsyncSession = Depends(get_db), userid: int):
 
 @router.get("/favoriteMovies/{userid}", summary="Get favorite movies of a user")
 async def favoriteMovie(*, session: AsyncSession = Depends(get_db), userid: int):
-    query = select(Rating, Movie).join(Movie).where(Rating.user_id == userid).order_by(desc(Rating.stars)).order_by(desc(Rating.timestamp)).limit(5)
+    query = select(Rating).where(Rating.user_id == userid).order_by(desc(Rating.stars)).order_by(desc(Rating.timestamp)).limit(5)
     result = await session.execute(query)
     print(result)
     ratings = result.scalars().all()
     if not ratings:
         raise HTTPException(status_code=404, detail="Ratings not found")
-    # From Ratings to RatingReturn
     ratingList = list_rating_to_list_rating_return(ratings)
-    print(ratingList)
     for rating in ratingList:
         query = select(Movie).where(Movie.movieid == rating.movie_id)
         result = await session.execute(query)
