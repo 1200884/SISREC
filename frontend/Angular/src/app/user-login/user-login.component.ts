@@ -25,6 +25,7 @@ export class UserLoginComponent {
           console.log("is Logged In")
           this.appcomponent.loggedIn=true;
           this.authService.setUserEmail(this.email)
+         // this.authService.setUserId(this.u)
           this.router.navigate(['/personalized-recommendations']);
         } else {
           console.log("is Not Logged In")

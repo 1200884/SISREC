@@ -20,12 +20,12 @@
 
 
 <div *ngIf="selectedMovie">
-  <h2>{{ selectedMovie.title }} , ({{selectedMovie.year}})</h2>
+  <h2>{{ selectedMovie.title }} ,  ({{selectedMovie.year}})</h2>
   <img [src]="selectedMovie.url" alt="Capa do Filme" class="movie-image">
   <p>{{ selectedMovie.weighted_rating }}</p>
   <div class="rating">
     Avalie este filme!
-    <span *ngFor="let star of [1, 2, 3, 4, 5]" (click)="rateMovie(star)">
+    <span *ngFor="let star of [1, 2, 3, 4, 5]" (click)="rateMovie(star,selectedMovie.id)">
       <i class="fas fa-star" [class.active]="star <= rating"></i>
     </span>
   </div>
