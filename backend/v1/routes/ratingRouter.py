@@ -27,51 +27,124 @@ async def createRating(*, session: AsyncSession = Depends(get_db), ratingCreate:
 
 @router.get("/", summary="Get a rating by user and movie")
 async def getRating(*, session: AsyncSession = Depends(get_db), user_id: int, movie_id: int):
-    query = select(Rating).where(Rating.user_id == user_id).where(Rating.movie_id == movie_id)
+    query = (
+        select(Rating.id, 
+               Rating.movie_id, 
+               Rating.user_id, 
+               Rating.stars, 
+               Rating.timestamp, 
+               Movie.title, 
+               Movie.titlelower, 
+               Movie.genres, 
+               Movie.imdbid, 
+               Movie.year, 
+               Movie.url)  
+        .join(Movie)  
+        .where(Rating.user_id == user_id)
+        .where(Rating.movie_id == movie_id)
+    )
     result = await session.execute(query)
-    rating = result.scalars().first()
-    if not rating:
-        raise HTTPException(status_code=404, detail="Rating not found")
-    else:
-        return rating
+    ratings_with_info = result.fetchone()
+    if not ratings_with_info:
+        raise HTTPException(status_code=404, detail="Ratings not found")
+    rating_dict = {
+        "id": ratings_with_info[0],
+        "movieId": ratings_with_info[1],
+        "userId": ratings_with_info[2],
+        "stars": ratings_with_info[3],
+        "timestamp": ratings_with_info[4],
+        "title": ratings_with_info[5],
+        "titleLower": ratings_with_info[6],
+        "genres": ratings_with_info[7],
+        "imdbId": ratings_with_info[8],
+        "year": ratings_with_info[9],
+        "url": ratings_with_info[10]
+    }
+    
+    return rating_dict
 
 @router.get("/history/{userid}", summary="Get last 5 ratings of a user")
 async def getRatings(*, session: AsyncSession = Depends(get_db), userid: int):
-    query = select(Rating).where(Rating.user_id == userid).order_by(desc(Rating.timestamp)).limit(5)
+    query = (
+        select(Rating.id, 
+               Rating.movie_id, 
+               Rating.user_id, 
+               Rating.stars, 
+               Rating.timestamp, 
+               Movie.title, 
+               Movie.titlelower, 
+               Movie.genres, 
+               Movie.imdbid, 
+               Movie.year, 
+               Movie.url)  
+        .join(Movie)
+        .where(Rating.user_id == userid)
+        .order_by(desc(Rating.timestamp))
+        .limit(5)
+    )
     result = await session.execute(query)
-    ratings = result.scalars().all()
-    if not ratings:
+    ratings_with_info = result.fetchall()
+    if not ratings_with_info:
         raise HTTPException(status_code=404, detail="Ratings not found")
-    ratingList = list_rating_to_list_rating_return(ratings)
-    for rating in ratingList:
-        query = select(Movie).where(Movie.movieid == rating.movie_id)
-        result = await session.execute(query)
-        ratingQuery = result.scalars().first()
-        rating.titleMovie = ratingQuery.title
-        rating.genresMovie = ratingQuery.genres
-        rating.imdbidMovie = ratingQuery.imdbid
-        rating.yearMovie = ratingQuery.year
-        rating.urlMovie = ratingQuery.url
-    return ratingList
+    structured_response = []
+    for rating_info in ratings_with_info:
+        rating_dict = {
+            "id": rating_info[0],
+            "movieId": rating_info[1],
+            "userId": rating_info[2],
+            "stars": rating_info[3],
+            "timestamp": rating_info[4],
+            "title": rating_info[5],
+            "titleLower": rating_info[6],
+            "genres": rating_info[7],
+            "imdbId": rating_info[8],
+            "year": rating_info[9],
+            "url": rating_info[10]
+        }
+        structured_response.append(rating_dict)
+    
+    return structured_response
+
 
 @router.get("/favoriteMovies/{userid}", summary="Get favorite movies of a user")
 async def favoriteMovie(*, session: AsyncSession = Depends(get_db), userid: int):
-    query = select(Rating).where(Rating.user_id == userid).order_by(desc(Rating.stars)).order_by(desc(Rating.timestamp)).limit(5)
+    query = (
+        select(Rating.id, 
+               Rating.movie_id, 
+               Rating.user_id, 
+               Rating.stars, 
+               Rating.timestamp, 
+               Movie.title, 
+               Movie.titlelower, 
+               Movie.genres, 
+               Movie.imdbid, 
+               Movie.year, 
+               Movie.url)  
+        .join(Movie)
+        .where(Rating.user_id == userid)
+        .order_by(desc(Rating.stars))
+        .order_by(desc(Rating.timestamp))
+        .limit(5)
+    )
     result = await session.execute(query)
-    print(result)
-    ratings = result.scalars().all()
-    if not ratings:
+    ratings_with_info = result.fetchall()
+    if not ratings_with_info:
         raise HTTPException(status_code=404, detail="Ratings not found")
-    ratingList = list_rating_to_list_rating_return(ratings)
-    for rating in ratingList:
-        query = select(Movie).where(Movie.movieid == rating.movie_id)
-        result = await session.execute(query)
-        ratingQuery = result.scalars().first()
-        rating.titleMovie = ratingQuery.title
-        rating.genresMovie = ratingQuery.genres
-        rating.imdbidMovie = ratingQuery.imdbid
-        rating.yearMovie = ratingQuery.year
-        rating.urlMovie = ratingQuery.url
-
-    return ratingList
-
+    structured_response = []
+    for rating_info in ratings_with_info:
+        rating_dict = {
+            "id": rating_info[0],
+            "movieId": rating_info[1],
+            "userId": rating_info[2],
+            "stars": rating_info[3],
+            "timestamp": rating_info[4],
+            "title": rating_info[5],
+            "titleLower": rating_info[6],
+            "genres": rating_info[7],
+            "imdbId": rating_info[8],
+            "year": rating_info[9],
+            "url": rating_info[10]
+        }
+        structured_response.append(rating_dict)
+    
+    return structured_response
