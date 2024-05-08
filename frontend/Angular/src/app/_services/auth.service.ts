@@ -89,7 +89,7 @@ export class AuthService {
         .pipe(
           map((response: any) => {
             console.log('Resposta do backend:', response);
-            this.userid=response.user;
+            this.userid=response.userId;
             console.log("user id ->" + this.userid)
             this.isLoggedIn=true;
             return response.status === 200; 
@@ -146,8 +146,12 @@ export class AuthService {
     };
     return this.http.post<boolean>(environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL + "/addfavorite", body)
   }
+  
   getFavorites(email: string): Observable<string[]> {
-    return this.http.get<string[]>(environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL + "/getfavorites/" + email);
+    return this.http.get<string[]>(environment.BACKEND_URL_LOCAL + environment.RATINGS_URL + "favoriteMovies/"+ this.userid);
+  }
+  getHistoryRatings(): Observable<string[]> {
+    return this.http.get<string[]>(environment.BACKEND_URL_LOCAL + environment.RATINGS_URL + "history/"+ this.userid);
   }
   removeFavorite(email: string, favorite: string): Observable<boolean> {
     const body = {
@@ -156,7 +160,6 @@ export class AuthService {
     };
     return this.http.post<boolean>(environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL + "/removefavorite", body)
   }
-
   inactive(email: string): Observable<boolean> {
     console.log("email service: " + email);
     const url = environment.LOGISTICS_URL_LOCAL + environment.AUTH_URL + "/deleteemployee/" + email;

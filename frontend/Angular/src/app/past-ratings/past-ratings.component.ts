@@ -13,9 +13,10 @@ export class PastRatingsComponent {
 
   p: number = 1;
   searchTerm: string = '';
-  pastRatings: Appointment[] = [];
   barbeirosFiltrados: any[] = [];
   favoritos: string[] = [];
+  pastRatings: any[] = [];
+
   userEmail = this.authService.getUserEmail();
 
   constructor(private appointmentService: AppointmentService, private authService: AuthService, //private router: Router
@@ -28,22 +29,16 @@ export class PastRatingsComponent {
   }
 
   carregarPastRatings() {
-    // Obter os compromissos do cliente usando subscribe
-    this.appointmentService.getAppointmentsFromClient(this.userEmail).subscribe(allAppointments => {
-      // Obter a data atual
-      const currentDate = new Date();
-
-      // Filtrar os compromissos futuros
-      this.pastRatings = allAppointments.filter(appointment => {
-        const appointmentDate = new Date(appointment.day); // Certifique-se de que a propriedade 'day' existe no objeto do compromisso
-        console.log("appointmentdate= " + appointmentDate)
-        console.log("current date -> " + currentDate)
-        return appointmentDate < currentDate;
-      });
-      this.pastRatings.reverse();
-      console.log("past Ratings -> " + this.pastRatings)
-    });
-  }
-
-
+        this.authService.getHistoryRatings().subscribe(
+        (movies: string[]) => {
+          this.pastRatings = movies;
+          console.log("past ratings -> "+ this.pastRatings);
+  
+        },
+        error => {
+          console.error('Erro ao carregar os filmes favoritos:', error);
+        }
+      );
+    
+    }
 }

@@ -1,0 +1,33 @@
+.movie-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Centraliza o conteúdo horizontalmente */
+    margin-top: 100px;
+  }
+.h2 {
+    margin-top: 100px;
+}
+  .movie-item {
+    margin-right: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .movie-content {
+    text-align: center;
+  }
+  
+  .movie-image {
+    width: 150px; /* Defina a largura desejada para as imagens dos filmes */
+  height: 225px; /* Defina a altura desejada para as imagens dos filmes */
+  object-fit: cover; /* Garante que a imagem cubra o espaço especificado */
+  }
+  
+  .movie-title {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  .movie-rating {
+    margin-top: 12px;
+    font-weight: bold;
+  }
+  
