@@ -3,6 +3,7 @@
 import { Component } from '@angular/core';
 import { AppointmentService } from '../_services/appointment.service';
 import { AuthService } from '../_services/auth.service';
+import { Movie } from '../_models/Movie';
 
 @Component({
   selector: 'app-favorite-movies',
@@ -26,20 +27,18 @@ export class FavoriteMoviesComponent {
   }
 
   carregarFavoriteMovies() {
-    // Obter os compromissos do cliente usando subscribe
-    this.appointmentService.getAppointmentsFromClient(this.userEmail).subscribe(allAppointments => {
-      // Obter a data atual
-      const currentDate = new Date();
+    this.userEmail = this.authService.getUserEmail();
+    this.authService.getFavorites(this.userEmail).subscribe(
+      (movies: string[]) => {
+        this.favoriteMovies = movies;
+        console.log("favorite Movies -> "+ this.favoriteMovies);
 
-      // Filtrar os compromissos futuros
-      this.favoriteMovies = allAppointments.filter(appointment => {
-        const appointmentDate = new Date(appointment.day);
-        return appointmentDate > currentDate;
-      });
-      console.log("future appointments -> " + this.favoriteMovies)
-    });
+      },
+      error => {
+        console.error('Erro ao carregar os filmes favoritos:', error);
+      }
+    );
   }
-
   cancelarCompromisso(day: string, place: string, email: string, accountable: string, type: string) {
     this.appointmentService.deleteAppointment(day, place, email, accountable, type).subscribe(
       () => {

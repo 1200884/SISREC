@@ -3,6 +3,7 @@ import { AuthService } from '../../_services/auth.service';
 import { User } from 'src/app/_models/User';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
+import { UserRegister } from 'src/app/_models/UserRegister';
 
 @Component({
   selector: 'app-register',
@@ -11,11 +12,10 @@ import { Router } from '@angular/router';
 })
 export class RegisterComponent implements OnInit {
   form: any = {
-    firstName: null,
-    phoneNumber: null,
-    lastName: null,
+    name: null,
     email: null,
-    role: null
+    password: null
+
   };
   isSuccessful = false;
   isSignUpFailed = false;
@@ -34,11 +34,11 @@ export class RegisterComponent implements OnInit {
   onSubmitClient(): void {
     this.registrationAttempted = true; 
 
-    this.form.role= "client"
-    const { firstName, phoneNumber, lastName, email, role } = this.form;
-    console.log(firstName)
-    console.log()
-    let user : User;
+    const { name, email,password,} = this.form;
+    console.log(name)
+    console.log(email)
+    console.log(password)
+    let user : UserRegister;
     user = this.form;
     this.errorMessage='';
     this.authService.register(user).subscribe(
@@ -47,7 +47,8 @@ export class RegisterComponent implements OnInit {
         this.isSuccessful = true;
         this.isSignUpFailed = false;
         this.errorMessage =    "Utilizador criado com sucesso.";
- 
+        this.authService.setNewUserEmail(email)
+        this.router.navigate(['/favorite-genres']);
       },
       (err) => {
         if (err.status === 402) {

@@ -60,7 +60,9 @@ export class AppComponent implements OnInit {
     this.verifyLogin();
     
   }
-
+  refreshPage(): void {
+    location.reload();
+  }
   logout(): void {
     //this.socialAuthService.signOut();
   }
@@ -73,7 +75,7 @@ export class AppComponent implements OnInit {
   }
   
   
-  submitRegistrationFormClient() {
+  /*submitRegistrationFormClient() {
     console.log('Primeiro Nome:', this.newuserfirstname);
     console.log('Último Nome:', this.newuserlastname);
     console.log('Email:', this.newuseremail);
@@ -82,7 +84,7 @@ export class AppComponent implements OnInit {
     const {  newuserfirstname, newuserlastname,newuseremail, newuserphonenumber, newuserrole } = this.form;
     let user : User;
     user = this.form;
-    this.authService.register(user).subscribe(
+    this.authService.register(userRe).subscribe(
       data => {
         console.log(data);        
       },
@@ -91,7 +93,7 @@ export class AppComponent implements OnInit {
       }
     );
 
-  }
+  }*/
   
   showRegistrationForm() {
     // Mostrar o formulário de registro definindo isRegistrationFormVisible como true

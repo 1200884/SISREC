@@ -13,7 +13,12 @@ export const environment = {
   APPOINTMENTS_URL: "/appointment",
   AUTH_URL: "/auth",
   PLACES_URL: "/place",
-  LOGIN_URL: "/users/login"
+  USERS_URL: "/users",
+  USERSGENRES_URL:"/users/genres",
+  LOGIN_URL: "/users/login",
+  RECOMMENDATIONSNONPERSONALIZED: "/recommendation/nonpersonalized",
+  MOVIESSEARCH:"/movies/search/",
+  RATINGS_URL:"/ratings/"
 };
 
 /*

@@ -1,9 +1,15 @@
-<div>
-   <!-- <button mat-raised-button (click)="solarios()">Solários</button>
-    <button mat-raised-button (click)="cabeleireiros()">Cabeleireiros</button>
-    <button mat-raised-button (click)="barbearias()">Barbearias</button>
-    <button mat-raised-button (click)="esteticistas()">Esteticistas</button>
-    <button mat-raised-button (click)="favoritos()">Favoritos</button>
-    -->
-
+<div *ngIf="movies.length > 0; else noMovies">
+  <h2>Filmes Recomendados</h2>
+  <div class="movie-list">
+    <div *ngFor="let movie of movies" class="movie-item">
+      <div class="movie-content">
+        <img [src]="movie.url" alt="Capa do Filme" class="movie-image">
+        <div class="movie-title">{{ movie.title }}</div>
+      </div>
+    </div>
   </div>
+</div>
+
+<ng-template #noMovies>
+  <p>Nenhum filme recomendado no momento.</p>
+</ng-template>

@@ -1,3 +1,5 @@
 backend/v1/recommender/dataset/
 backend/v1/utils/ratings.csv
-
+backend/v1/utils/movies_with_imdb.csv
+backend/v1/utils/movies_with_url.csv
+backend/v1/utils/movies_full.csv

@@ -1,28 +1,17 @@
-<!-- past-ratings.component.html -->
+<div *ngIf="pastRatings.length > 0; else noFavoriteMovies">
+  <h2>Últimas avaliações</h2>
+  <div class="movie-list">
+    <div *ngFor="let movie of pastRatings" class="movie-item">
+      <div class="movie-content">
+        <img [src]="movie.url" alt="Capa do Filme" class="movie-image">
+        <div class="movie-title">{{ movie.title }}</div>
+        <div class="movie-rating">({{ movie.stars }} estrelas)</div>
 
-<div class="container">
-    <h2>Histórico de Avaliações</h2>
-  
-    <div *ngIf="pastRatings.length === 0">
-      <p>Não há avaliações realizadas.</p>
-    </div>
-  
-    <div *ngIf="pastRatings.length > 0">
-      <table class="table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Hora</th>
-            <th>Local</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let appointment of pastRatings">
-            
-            <td>{{ appointment.place }}</td>
-          </tr>
-        </tbody>
-      </table>
+      </div>
     </div>
   </div>
-  
+</div>
+
+<ng-template #noFavoriteMovies>
+  <p>Nenhuma avalição realizada.</p>
+</ng-template>

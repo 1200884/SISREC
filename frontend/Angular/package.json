@@ -24,6 +24,7 @@
     "@angular/platform-browser-dynamic": "^15.0.0",
     "@angular/router": "^15.2.10",
     "@fireflysemantics/join": "^1.0.14",
+    "@fortawesome/fontawesome-free": "^6.5.2",
     "@fullcalendar/core": "^6.1.9",
     "@fullcalendar/daygrid": "^6.1.9",
     "@fullcalendar/timegrid": "^6.1.9",

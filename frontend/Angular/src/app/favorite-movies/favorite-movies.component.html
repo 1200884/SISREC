@@ -1,34 +1,17 @@
-<!-- future-appointments.component.html -->
+<div *ngIf="favoriteMovies.length > 0; else noFavoriteMovies">
+  <h2>Filmes Recomendados</h2>
+  <div class="movie-list">
+    <div *ngFor="let movie of favoriteMovies" class="movie-item">
+      <div class="movie-content">
+        <img [src]="movie.url" alt="Capa do Filme" class="movie-image">
+        <div class="movie-title">{{ movie.title }}</div>
+        <div class="movie-rating">({{ movie.stars }} estrelas)</div>
 
-<div class="container">
-  <h2>Filmes Preferidos</h2>
-
-  <div *ngIf="favoriteMovies.length === 0">
-      <p>Não há filmes preferidos.</p>
-  </div>
-
-  <div *ngIf="favoriteMovies.length > 0">
-      <table class="table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Hora</th>
-            <th>Local</th>
-            <th>Cancelar Compromissos</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let appointment of favoriteMovies">
-            
-            <td>{{ appointment.place }}</td>
-            <td>
-              <button (click)="cancelarCompromisso(appointment.day, appointment.place, appointment.email, appointment.accountable, appointment.type)" class="btn btn-danger">Cancelar</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div *ngIf="marcacaoCancelada">
-          <p>Marcação cancelada com sucesso!</p>
       </div>
     </div>
+  </div>
 </div>
+
+<ng-template #noFavoriteMovies>
+  <p>Nenhum filme preferido.</p>
+</ng-template>

@@ -1,17 +1,17 @@
 <div id="app">
   <nav id="bar" class="navbar navbar-expand navbar-dark bg-dark">
-    <a href="home" class="navbar-brand" routerLink="">Movie App</a>
+    <a class="navbar-brand" [routerLink]="loggedIn ? '/personalized-recommendations' : '/board-client'">Movie App</a>
 
     <ul class="navbar-nav mr-auto" routerLinkActive="active">
       <!-- Adicione aqui os links da barra de navegação, se necessário -->
       <li class="nav-item">
         <a  *ngIf="loggedIn" class="nav-link" routerLink="/profile">Perfil</a>
         <a *ngIf="!loggedIn" class="nav-link" routerLink="/user-login">Login</a>
-        <a  *ngIf="loggedIn" class="nav-link" routerLink="/logout">Logout</a>
+        <a *ngIf="loggedIn" class="nav-link" href="javascript:void(0);" (click)="refreshPage()">Logout</a>
+        <a  *ngIf="!loggedIn" class="nav-link" routerLink="/register">Registar-me</a> 
       </li>
     </ul>
   </nav>
-
   <router-outlet></router-outlet>
   
 
