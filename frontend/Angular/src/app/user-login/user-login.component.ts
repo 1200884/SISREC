@@ -13,7 +13,8 @@ import { AppComponent } from '../app.component';
 export class UserLoginComponent {
   email: string = '';
   password: string = '';
-
+  loginerror: string= 'Erro ao fazer login';
+  loginError:boolean= false;
   constructor(private authService: AuthService, private appcomponent: AppComponent, private router: Router) { }
 
   onSubmit(): void {
@@ -24,16 +25,23 @@ export class UserLoginComponent {
         if (this.authService.isLoggedIn) {
           console.log("is Logged In")
           this.appcomponent.loggedIn=true;
+          
           this.authService.setUserEmail(this.email)
-         // this.authService.setUserId(this.u)
+          this.loginError=true;
           this.router.navigate(['/personalized-recommendations']);
         } else {
           console.log("is Not Logged In")
           console.error('O login falhou');
+          this.loginError=true;
+          console.log(this.loginError)
         }
       },
       (error) => {
         console.error('Erro ao fazer login:', error);
+        this.loginError=true;
+        console.log(this.loginError)
+        this.loginerror = 'Erro ao fazer login'; // Mensagem de erro genérico
+
       }
     );
   }

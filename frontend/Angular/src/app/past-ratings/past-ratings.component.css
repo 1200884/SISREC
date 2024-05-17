@@ -5,8 +5,9 @@
     margin-top: 100px;
   }
 .h2 {
-    margin-top: 100px;
-}
+    text-align: center; /* Centraliza o título h2 */
+    margin-top: 50px;
+    font-size: 40px;}
   .movie-item {
     margin-right: 20px;
     margin-bottom: 20px;

@@ -5,6 +5,9 @@
       <div class="movie-content">
         <img [src]="movie.url" alt="Capa do Filme" class="movie-image">
         <div class="movie-title">{{ movie.title }}</div>
+        <div class="movie-nelson">({{ movie.count }} avaliações , {{ movie.mean | number:'1.2-2' }} ★)</div>
+
+
       </div>
     </div>
   </div>
