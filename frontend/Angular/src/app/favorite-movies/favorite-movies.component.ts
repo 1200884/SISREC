@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { AppointmentService } from '../_services/appointment.service';
 import { AuthService } from '../_services/auth.service';
 import { Movie } from '../_models/Movie';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-favorite-movies',
@@ -19,7 +20,7 @@ export class FavoriteMoviesComponent {
   userEmail = this.authService.getUserEmail();
   marcacaoCancelada: boolean = false;
 
-  constructor(private appointmentService: AppointmentService, private authService: AuthService) { }
+  constructor(private appointmentService: AppointmentService, private authService: AuthService, private router:Router) { }
 
   ngOnInit() {
     this.carregarFavoriteMovies();
@@ -51,5 +52,8 @@ export class FavoriteMoviesComponent {
     setTimeout(() => {
       //this.router.navigate(['/profile']);
     }, 2300); 
+  }
+  goBack(){
+    this.router.navigate(['/profile'])
   }
 }

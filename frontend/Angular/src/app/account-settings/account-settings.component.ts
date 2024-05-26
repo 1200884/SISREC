@@ -16,6 +16,6 @@ export class AccountSettingsComponent {
   userPhoneNumber = this.authService.getPhoneNumber();
   
   goBack(){
-    this.router.navigate(['/board-client'])
+    this.router.navigate(['/profile'])
   }
 }

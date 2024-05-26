@@ -1,5 +1,5 @@
 <div *ngIf="favoriteMovies.length > 0; else noFavoriteMovies">
-  <h2>Filmes Favoritos</h2>
+  <h2>Favourite Movies</h2>
   <div class="movie-list">
     <div *ngFor="let movie of favoriteMovies" class="movie-item">
       <div class="movie-content">
@@ -9,6 +9,9 @@
 
       </div>
     </div>
+  </div>
+  <div class="button-container">
+    <button mat-raised-button (click)="goBack()">Go back</button>
   </div>
 </div>
 

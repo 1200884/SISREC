@@ -4,6 +4,11 @@
     justify-content: center; /* Centraliza o conteúdo horizontalmente */
     margin-top: 100px;
   }
+  .button-container {
+    display: flex;
+    justify-content: center; /* Isso centraliza o botão horizontalmente */
+    margin-top: 20px; /* Espaço opcional acima do botão */
+  }
   
   h2 {
     text-align: center; /* Centraliza o título h2 */

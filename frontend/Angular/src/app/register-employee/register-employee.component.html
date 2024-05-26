@@ -16,8 +16,8 @@
       <label for="phoneNumber">Número de Telefone</label>
       <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control">
     </div>
-    <button type="submit" class="btn btn-primary">Registar</button>
-    <button class="btn btn-primary" (click)="goBack(); hideRegistrationForm()">Voltar</button>
+    <button type="submit" class="btn btn-primary">Register</button>
+    <button class="btn btn-primary" (click)="goBack(); hideRegistrationForm()">Go back</button>
     <div *ngIf="registrationAttempted">
       <div *ngIf="isSuccessful" class="alert alert-success">
         {{errorMessage}}

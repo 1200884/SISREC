@@ -12,6 +12,11 @@
     margin-right: 20px;
     margin-bottom: 20px;
   }
+  .button-container {
+    display: flex;
+    justify-content: center; /* Isso centraliza o botão horizontalmente */
+    margin-top: 20px; /* Espaço opcional acima do botão */
+  }
   
   .movie-content {
     text-align: center;

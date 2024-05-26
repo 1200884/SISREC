@@ -1,11 +1,11 @@
 <div *ngIf="movies.length > 0; else noMovies">
-  <h2>Filmes Recomendados</h2>
+  <h2>Recommended Movies</h2>
   <div class="movie-list">
     <div *ngFor="let movie of movies" class="movie-item">
       <div class="movie-content">
         <img [src]="movie.url" alt="Capa do Filme" class="movie-image">
         <div class="movie-title">{{ movie.title }}</div>
-        <div class="movie-nelson">({{ movie.count }} avaliações , {{ movie.mean | number:'1.2-2' }} ★)</div>
+        <div class="movie-nelson">({{ movie.count }} rates , {{ movie.mean | number:'1.2-2' }} ★)</div>
 
 
       </div>
@@ -14,5 +14,5 @@
 </div>
 
 <ng-template #noMovies>
-  <p>Nenhum filme recomendado no momento.</p>
+  <p>No movies recommended for now.</p>
 </ng-template>
