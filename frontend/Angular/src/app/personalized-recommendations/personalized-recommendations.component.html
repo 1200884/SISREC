@@ -1,17 +1,17 @@
 <div class="search-container">
-  <input type="text" [(ngModel)]="searchQuery" (input)="searchMovies()" placeholder="Pesquisar Filmes">
+  <input type="text" [(ngModel)]="searchQuery" (input)="searchMovies()" placeholder="Search Movies">
   <div class="dropdown" *ngIf="movies.length > 0">
-    <button class="dropbtn" (mouseenter)="openDropdown()">Selecionar Filme</button>
+    <button class="dropbtn" (mouseenter)="openDropdown()">Choose Movie</button>
     <div class="dropdown-content" *ngIf="isDropdownOpen" (mouseleave)="closeDropdown()">
       <ul>
         <li *ngFor="let movie of filteredMovies" (click)="selectMovie(movie)">
           {{ movie.title }}
         </li>
         <li *ngIf="!isLoading && filteredMovies.length === 0">
-          Nenhum filme encontrado.
+          No movies found.
         </li>
         <li *ngIf="isLoading">
-          Carregando...
+          Loading...
         </li>
       </ul>
     </div>
@@ -24,11 +24,12 @@
   <img [src]="selectedMovie.url" alt="Capa do Filme" class="movie-image">
   <p>{{ selectedMovie.weighted_rating }}</p>
   <div class="rating">
-    Avalie este filme!
-    <span *ngFor="let star of [1, 2, 3, 4, 5]" (click)="rateMovie(star,selectedMovie.id)">
+    Rate this movie!
+    <span *ngFor="let star of [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]" (click)="rateMovie(star, selectedMovie.id)">
       <i class="fas fa-star" [class.active]="star <= rating"></i>
     </span>
   </div>
+  
 
-Seu Rating: {{rating}} estrelas
+Your Rating: {{rating}} stars
 </div>

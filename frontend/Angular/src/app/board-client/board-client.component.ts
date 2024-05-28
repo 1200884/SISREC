@@ -25,6 +25,7 @@ export class BoardClientComponent implements OnInit {
       (movies: Movie[]) => {
         // Atribuir os resultados ao array de filmes
         this.movies = movies;
+        
       },
       (error) => {
         console.error('Erro ao obter as recomendações de filmes:', error);
