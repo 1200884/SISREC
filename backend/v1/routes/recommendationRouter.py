@@ -60,7 +60,7 @@ async def nonPersonalisedGender(genre: str):
         best_movies_for_genres[genre] = best_movie.to_dict(orient='records')
     return best_movies_for_genres
 
-@router.post("/nonpersonalizedYear/{year}", summary="Get non-personalized recommendations with year")
+@router.get("/nonpersonalizedYear/{year}", summary="Get non-personalized recommendations with year")
 async def nonPersonalisedYear(year: int):
     script_dir = os.path.dirname(__file__)
     df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
@@ -68,7 +68,7 @@ async def nonPersonalisedYear(year: int):
     movies_year_best = df[['movieId', 'title', 'url', 'Num_ratings' ,'Bayesian_rating']].head(5)
     return movies_year_best.to_dict(orient='records')
 
-@router.post("/nonpersonalizedDecade/{decade}", summary="Get non-personalized recommendations with decade")
+@router.get("/nonpersonalizedDecade/{decade}", summary="Get non-personalized recommendations with decade")
 async def nonPersonalisedDecate(decade: int):
     script_dir = os.path.dirname(__file__)
     df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
