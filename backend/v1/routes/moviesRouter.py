@@ -31,8 +31,8 @@ async def getRandomMovie(*, session: AsyncSession = Depends(get_db)):
     return movie
 
 script_dir = os.path.dirname(__file__)
-tags_df = pd.read_csv(os.path.join(script_dir, "../utils/tags_novo.csv"))
-movies_df = pd.read_csv(os.path.join(script_dir, "../utils/movies_full_novo.csv"))
+tags_df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/tags.csv"))
+movies_df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_full_2.csv"))
 tags_df.set_index('movieId', inplace=True)
 movies_df.set_index('movieId', inplace=True)
 tags_df['tag'] = tags_df['tag'].str.lower()
