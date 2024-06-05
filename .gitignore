@@ -2,6 +2,12 @@ backend/v1/recommender/dataset/
 backend/v1/utils/ratings.csv
 backend/v1/utils/movies_with_imdb.csv
 backend/v1/utils/movies_with_url.csv
+backend/v1/utils/movies.csv
+backend/v1/utils/tags.csv
+backend/v1/utils/tags_novo.csv
+backend/v1/utils/movies_tags.csv
+backend/v1/utils/movies_full_novo.csv
+backend/v1/utils/movies_full_tag.csv
 backend/v1/utils/movies_full.csv
 backend/v1/utils/larger_dataset/
 backend/v1/utils/larger_dataset
