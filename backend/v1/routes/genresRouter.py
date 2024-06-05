@@ -14,7 +14,7 @@ router = APIRouter(prefix='/genres', tags=['Genres'])
 async def getGenres(*, session: AsyncSession = Depends(get_db)):
     lista = []
     script_dir = os.path.dirname(__file__)
-    path = r"../recommender/dataset/movies.csv"
+    path = r"../recommender/dataset/small_dataset/movies.csv"
     file_path = os.path.join(script_dir, path)
     genre = await session.execute(select(Genre))
     if genre.scalars().all():
