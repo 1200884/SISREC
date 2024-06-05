@@ -48,7 +48,7 @@ async def nonPersonalised():
             data = json.load(file)
             return data
         
-@router.post("/nonpersonalizedGenre/{genre}", summary="Get non-personalized recommendations with genre")
+@router.get("/nonpersonalizedGenre/{genre}", summary="Get non-personalized recommendations with genre")
 async def nonPersonalisedGender(genre: str):
     script_dir = os.path.dirname(__file__)
     df = pd.read_csv(os.path.join(script_dir, "../utils/movies_full.csv"))
@@ -59,7 +59,15 @@ async def nonPersonalisedGender(genre: str):
         best_movie = genre_df[['movieId', 'title']].head(5)
         best_movies_for_genres[genre] = best_movie.to_dict(orient='records')
     return best_movies_for_genres
-        
+
+@router.post("/nonpersonalizedYear/{year}", summary="Get non-personalized recommendations with year")
+async def nonPersonalisedYear(year: int):
+    script_dir = os.path.dirname(__file__)
+    df = pd.read_csv(os.path.join(script_dir, "../utils/movies_full.csv"))
+    df = df[df['year'] == year]
+    movies_year_best = df[['movieId', 'title', 'year']].head(5)
+    return movies_year_best.to_dict(orient='records')
+
 def nonPersonalizedToFile():
     script_dir = os.path.dirname(__file__)
     path = os.path.join(script_dir, '../utils/NonPersonalized.json')
