@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
+from models import *
 import pandas as pd
 import os
 import json
@@ -46,6 +47,18 @@ async def nonPersonalised():
             #return JSONResponse(content=file.read())
             data = json.load(file)
             return data
+        
+@router.post("/nonpersonalizedGenre/{genre}", summary="Get non-personalized recommendations with genre")
+async def nonPersonalisedGender(genre: str):
+    script_dir = os.path.dirname(__file__)
+    df = pd.read_csv(os.path.join(script_dir, "../utils/movies_full.csv"))
+    df['genres'] = df['genres'].str.split(', ')
+    best_movies_for_genres = {}
+    genre_df = df[df['genres'].apply(lambda x: genre in x)]
+    if not genre_df.empty:
+        best_movie = genre_df[['movieId', 'title']].head(5)
+        best_movies_for_genres[genre] = best_movie.to_dict(orient='records')
+    return best_movies_for_genres
         
 def nonPersonalizedToFile():
     script_dir = os.path.dirname(__file__)
