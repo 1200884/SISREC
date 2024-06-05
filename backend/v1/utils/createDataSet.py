@@ -9,8 +9,8 @@ movies_df['decade'] = (movies_df['year'] // 10) * 10
 movies_rating_user_df = pd.merge(movies_df, ratings_df, on="movieId", how="inner")
 
 # Mantém o movieId como coluna, não como parte do índice
-movies_rating_df = movies_rating_user_df[['movieId', 'title', 'rating', 'genres', 'year', 'decade']].groupby(
-    ['movieId', 'title', 'genres', 'year', 'decade']
+movies_rating_df = movies_rating_user_df[['movieId', 'title', 'rating', 'genres', 'year', 'decade', 'url']].groupby(
+    ['movieId', 'title', 'genres', 'year', 'decade', 'url']
 )['rating'].agg(['count', 'mean']).round(1).reset_index()
 
 movies_rating_df.sort_values('count', ascending=False, inplace=True)

@@ -76,6 +76,13 @@ async def nonPersonalisedDecate(decade: int):
     movies_decade_best = df[['movieId', 'title', 'url', 'Num_ratings' ,'Bayesian_rating']].head(5)
     return movies_decade_best.to_dict(orient='records')
 
+@router.get("/nonpersonalizedOverall", summary="Get non-personalized recommendations overall")
+async def nonPersonalisedOverall():
+    script_dir = os.path.dirname(__file__)
+    df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
+    movies_overall_best = df[['movieId', 'title', 'url', 'Num_ratings' ,'Bayesian_rating']].head(5)
+    return movies_overall_best.to_dict(orient='records')
+
 def nonPersonalizedToFile():
     script_dir = os.path.dirname(__file__)
     path = os.path.join(script_dir, '../utils/NonPersonalized.json')
