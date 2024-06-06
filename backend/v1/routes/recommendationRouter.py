@@ -91,6 +91,7 @@ async def nonPersonalisedOverall():
 async def personalisedColaborative(user_id: int):
     script_dir = os.path.dirname(__file__)
     df = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/ratings.csv"))
+    df_movies = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/movies_full_2.csv"))
     M = df['userId'].nunique()
     N = df['movieId'].nunique()
 
@@ -124,8 +125,19 @@ async def personalisedColaborative(user_id: int):
 
     recommended_movie_ids = [movie_inv_mapper[movie_index] for movie_index, _ in recommended_movies]
 
-    print(recommended_movie_ids[:5])
-    return {"message": "Personalized recommendations"}
+    recommendations = recommended_movie_ids[:5]
+
+    movie_details = []
+    for movie_id in recommendations:
+        movie_info = df_movies.loc[movie_id, ['title', 'url', 'genres', 'imdbId', 'year']]
+        movie_details.append({
+            'title': movie_info['title'],
+            'url': movie_info['url'],
+            'genres': movie_info['genres'],
+            'imdbId': movie_info['imdbId'],
+            'year': movie_info['year']
+        })
+    return movie_details
 
 @router.get("/personalizedContent", summary="Get personalized recommendations by content filtering")
 async def personalisedContent():
