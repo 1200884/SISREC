@@ -8,7 +8,8 @@ class User(SQLModel, table=True):
     name: str
     email: str
     password: str
-    genres: Optional[List[str]] = Field(sa_column=Column(JSON))
+    genresLike: Optional[List[str]] = Field(sa_column=Column(JSON))
+    genresDislike: Optional[List[str]] = Field(sa_column=Column(JSON))
 
 class UserCreate(SQLModel):
     name: str
@@ -30,4 +31,5 @@ class UserRead(SQLModel):
     name: str 
     email: str  
     password: str
-    genres: List[str]
+    genresLike: List[str]
+    genresDislike: List[str]
