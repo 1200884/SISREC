@@ -57,7 +57,6 @@ async def nonPersonalisedGenre(genre: str):
     genre_df = df[df['genres'].apply(lambda x: genre in x)]
     if not genre_df.empty:
         best_movie = genre_df[['movieId', 'title', 'url', 'Num_ratings' ,'Bayesian_rating']].head(5)
-        best_movie.rename({'Num_ratings': 'count', 'Bayesian_rating' : 'weighted_rating'}, inplace=True)
         best_movies_for_genres = best_movie.to_dict(orient='records')
     return best_movies_for_genres
 
@@ -67,7 +66,6 @@ async def nonPersonalisedYear(year: int):
     df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
     df = df[df['year'] == year]
     movies_year_best = df[['movieId', 'title', 'url', 'Num_ratings' ,'Bayesian_rating']].head(5)
-    movies_year_best.rename({'Num_ratings': 'count', 'Bayesian_rating' : 'weighted_rating'}, inplace=True)
     return movies_year_best.to_dict(orient='records')
 
 @router.get("/nonpersonalizedDecade/{decade}", summary="Get non-personalized recommendations with decade")
@@ -76,7 +74,6 @@ async def nonPersonalisedDecate(decade: int):
     df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
     df = df[df['decade'] == decade]
     movies_decade_best = df[['movieId', 'title', 'url', 'Num_ratings' ,'Bayesian_rating']].head(5)
-    movies_decade_best.rename({'Num_ratings': 'count', 'Bayesian_rating' : 'weighted_rating'}, inplace=True)
     return movies_decade_best.to_dict(orient='records')
 
 @router.get("/nonpersonalizedOverall", summary="Get non-personalized recommendations overall")
@@ -84,7 +81,6 @@ async def nonPersonalisedOverall():
     script_dir = os.path.dirname(__file__)
     df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
     movies_overall_best = df[['movieId', 'title', 'url', 'Num_ratings' ,'Bayesian_rating']].head(5)
-    movies_overall_best.rename({'Num_ratings': 'count', 'Bayesian_rating' : 'weighted_rating'}, inplace=True)
     return movies_overall_best.to_dict(orient='records')
 
 def nonPersonalizedToFile():

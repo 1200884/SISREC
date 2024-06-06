@@ -39,5 +39,7 @@ movies_rating_df = calculate_weighted_rating(movies_rating_df, C, 500)
 movies_rating_df.drop(columns='Average_rating', inplace=True)
 movies_rating_df.sort_values(by='Bayesian_rating', ascending=False, inplace=True)
 
+movies_rating_df.rename(columns={'Num_ratings': 'count', 'Bayesian_rating' : 'weighted_rating'}, inplace=True)
+
 # Salva o DataFrame no CSV, incluindo movieId
 movies_rating_df.to_csv(os.path.join(script_dir, "./small_dataset/movies_rating.csv"), index=False)

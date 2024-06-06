@@ -1,4 +1,4 @@
-movieId,title,genres,year,decade,url,Num_ratings,Bayesian_rating
+movieId,title,genres,year,decade,url,count,weighted_rating
 318,"Shawshank Redemption, The",Crime|Drama,1994.0,1990.0,https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg,317,3.8492044063647493
 356,Forrest Gump,Comedy|Drama|Romance|War,1994.0,1990.0,https://m.media-amazon.com/images/M/MV5BNWIwODRlZTUtY2U3ZS00Yzg1LWJhNzYtMmZiYmEyNmU1NjMzXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg,329,3.777804583835947
 296,Pulp Fiction,Comedy|Crime|Drama|Thriller,1994.0,1990.0,https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg,307,3.7662949194547704
