@@ -52,7 +52,7 @@ async def nonPersonalised():
 async def nonPersonalisedGender(genre: str):
     script_dir = os.path.dirname(__file__)
     df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
-    df['genres'] = df['genres'].str.split(', ')
+    df['genres'] = df['genres'].str.split('| ')
     best_movies_for_genres = {}
     genre_df = df[df['genres'].apply(lambda x: genre in x)]
     if not genre_df.empty:
