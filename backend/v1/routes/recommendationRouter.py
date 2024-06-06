@@ -56,7 +56,7 @@ async def nonPersonalisedGenre(genre: str):
     best_movies_for_genres = {}
     genre_df = df[df['genres'].apply(lambda x: genre in x)]
     if not genre_df.empty:
-        best_movie = genre_df[['movieId', 'title', 'url', 'Num_ratings' ,'Bayesian_rating']].head(5)
+        best_movie = genre_df[['movieId', 'title', 'url', 'count' ,'weighted_rating']].head(5)
         best_movies_for_genres = best_movie.to_dict(orient='records')
     return best_movies_for_genres
 
@@ -65,7 +65,7 @@ async def nonPersonalisedYear(year: int):
     script_dir = os.path.dirname(__file__)
     df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
     df = df[df['year'] == year]
-    movies_year_best = df[['movieId', 'title', 'url', 'Num_ratings' ,'Bayesian_rating']].head(5)
+    movies_year_best = df[['movieId', 'title', 'url', 'count' ,'weighted_rating']].head(5)
     return movies_year_best.to_dict(orient='records')
 
 @router.get("/nonpersonalizedDecade/{decade}", summary="Get non-personalized recommendations with decade")
@@ -73,14 +73,14 @@ async def nonPersonalisedDecate(decade: int):
     script_dir = os.path.dirname(__file__)
     df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
     df = df[df['decade'] == decade]
-    movies_decade_best = df[['movieId', 'title', 'url', 'Num_ratings' ,'Bayesian_rating']].head(5)
+    movies_decade_best = df[['movieId', 'title', 'url', 'count' ,'weighted_rating']].head(5)
     return movies_decade_best.to_dict(orient='records')
 
 @router.get("/nonpersonalizedOverall", summary="Get non-personalized recommendations overall")
 async def nonPersonalisedOverall():
     script_dir = os.path.dirname(__file__)
     df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
-    movies_overall_best = df[['movieId', 'title', 'url', 'Num_ratings' ,'Bayesian_rating']].head(5)
+    movies_overall_best = df[['movieId', 'title', 'url', 'count' ,'weighted_rating']].head(5)
     return movies_overall_best.to_dict(orient='records')
 
 def nonPersonalizedToFile():
