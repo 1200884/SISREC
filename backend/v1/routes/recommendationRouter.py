@@ -6,6 +6,10 @@ import os
 import json
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
+from sklearn.metrics.pairwise import cosine_similarity
+from fuzzywuzzy import process
+import numpy as np
+from scipy.sparse import csr_matrix
 load_dotenv()
 
 router = APIRouter(prefix='/recommendation', tags=['Recomendation'])
@@ -82,6 +86,54 @@ async def nonPersonalisedOverall():
     df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
     movies_overall_best = df[['movieId', 'title', 'url', 'count' ,'weighted_rating']].head(5)
     return movies_overall_best.to_dict(orient='records')
+
+@router.get("/personalizedColaborative/{user_id}", summary="Get personalized recommendations by colaborative filtering")
+async def personalisedColaborative(user_id: int):
+    script_dir = os.path.dirname(__file__)
+    df = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/ratings.csv"))
+    M = df['userId'].nunique()
+    N = df['movieId'].nunique()
+
+    user_mapper = dict(zip(np.unique(df["userId"]), list(range(M))))
+    movie_mapper = dict(zip(np.unique(df["movieId"]), list(range(N))))
+    
+    user_inv_mapper = dict(zip(list(range(M)), np.unique(df["userId"])))
+    movie_inv_mapper = dict(zip(list(range(N)), np.unique(df["movieId"])))
+    
+    user_index = [user_mapper[i] for i in df['userId']]
+    item_index = [movie_mapper[i] for i in df['movieId']]
+
+    X = csr_matrix((df["rating"], (user_index,item_index)), shape=(M,N))
+    ser_index = user_mapper[user_id]
+    similarities = cosine_similarity(X[user_index], X)
+
+    similar_users_indices = similarities.argsort()[0][-5-1:-1][::-1]
+
+    recommended_movies = {}
+
+    for similar_user_index in similar_users_indices:
+        unrated_movies = np.where(np.logical_and(X[user_index].toarray()[0] == 0, X[similar_user_index].toarray()[0] != 0))[0]
+        
+        for movie_index in unrated_movies:
+            if movie_index not in recommended_movies:
+                recommended_movies[movie_index] = similarities[0, similar_user_index] * X[similar_user_index, movie_index]
+            else:
+                recommended_movies[movie_index] += similarities[0, similar_user_index] * X[similar_user_index, movie_index]
+
+    recommended_movies = sorted(recommended_movies.items(), key=lambda x: x[1], reverse=True)
+
+    recommended_movie_ids = [movie_inv_mapper[movie_index] for movie_index, _ in recommended_movies]
+
+    print(recommended_movie_ids[:5])
+    return {"message": "Personalized recommendations"}
+
+@router.get("/personalizedContent", summary="Get personalized recommendations by content filtering")
+async def personalisedContent():
+    return {"message": "Personalized recommendations"}
+
+@router.get("/personalizedHybrid", summary="Get personalized recommendations by hybrid filtering")
+async def personalisedContent():
+    return {"message": "Personalized recommendations"}
 
 def nonPersonalizedToFile():
     script_dir = os.path.dirname(__file__)

@@ -7,11 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select, text
 from sqlalchemy import desc
 from time import time
+import csv
 
 router = APIRouter(prefix='/ratings', tags=['Ratings'])
 
 @router.post("/", summary="Create a rating")
 async def createRating(*, session: AsyncSession = Depends(get_db), ratingCreate: RatingCreate):
+    script_dir = os.path.dirname(__file__)
     query = select(Rating).where(Rating.user_id == ratingCreate.user_id).where(Rating.movie_id == ratingCreate.movie_id)
     result = await session.execute(query)
     rating = result.scalars().first()
@@ -23,6 +25,11 @@ async def createRating(*, session: AsyncSession = Depends(get_db), ratingCreate:
     session.add(db_rating)
     await session.commit()
     await session.refresh(db_rating)
+    fields=[ratingCreate.user_id,ratingCreate.movie_id,ratingCreate.stars, intCurrent]
+    path = os.path.join(script_dir, '../recommender/dataset/small_dataset/ratings.csv')
+    with open(path, 'a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(fields)
     return db_rating
 
 @router.get("/", summary="Get a rating by user and movie")
