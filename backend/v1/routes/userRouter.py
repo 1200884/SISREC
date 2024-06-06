@@ -22,21 +22,22 @@ async def createUser(*, session: AsyncSession = Depends(get_db), userCreate: Use
         lastUserIdPlusOne = 200000
     else:
         lastUserIdPlusOne = lastUser.id + 1
-    db_user = User(id=lastUserIdPlusOne,name=userCreate.name, email=userCreate.email, password=userCreate.password, genres=[])
+    db_user = User(id=lastUserIdPlusOne,name=userCreate.name, email=userCreate.email, password=userCreate.password, genresLike=[], genresDislike=[])
     session.add(db_user)
     await session.commit()
     await session.refresh(db_user)
     return db_user
 
 @router.post("/genres/{email}", summary="Add genres to a user")
-async def addGenresToUser(*, session: AsyncSession = Depends(get_db), email: str, genres: List[str]):
+async def addGenresToUser(*, session: AsyncSession = Depends(get_db), email: str, genresLike: List[str], genresDislike: List[str]):
     query = select(User).where(User.email == email)
     # Change genres to the user
     result = await session.execute(query)
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    user.genres = genres
+    user.genresLike = genresLike
+    user.genresDislike = genresDislike
     session.add(user)
     await session.commit()
     await session.refresh(user)
