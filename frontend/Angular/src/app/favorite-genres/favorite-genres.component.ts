@@ -35,15 +35,50 @@ export class FavoriteGenresComponent {
     { id: 19, name: 'Western', selected: false },
     { id: 20, name: 'Film-Noir', selected: false }
   ];
+  genres1: Genre[] = [
+    { id: 1, name: 'Action', selected: false },
+    { id: 2, name: 'Adventure', selected: false },
+    { id: 3, name: 'Animation', selected: false },
+    { id: 4, name: 'Children', selected: false },
+    { id: 5, name: 'Comedy', selected: false },
+    { id: 6, name: 'Fantasy', selected: false },
+    { id: 7, name: 'Romance', selected: false },
+    { id: 8, name: 'Drama', selected: false },
+    { id: 9, name: 'Action', selected: false },
+    { id: 10, name: 'Crime', selected: false },
+    { id: 11, name: 'Thriller', selected: false },
+    { id: 12, name: 'Horror', selected: false },
+    { id: 13, name: 'Mystery', selected: false },
+    { id: 14, name: 'Sci-Fi', selected: false },
+    { id: 15, name: 'IMAX', selected: false },
+    { id: 16, name: 'Documentary', selected: false },
+    { id: 17, name: 'War', selected: false },
+    { id: 18, name: 'Musical', selected: false },
+    { id: 19, name: 'Western', selected: false },
+    { id: 20, name: 'Film-Noir', selected: false }
+  ];
   constructor(private authService: AuthService, private router: Router) { }
   selectedGenres: Genre[] = [];
-
+  leastfavoriteselectedGenres: Genre[] =[]
   toggleSelection(genre: Genre): void {
     if (genre.selected) {
       this.selectedGenres = this.selectedGenres.filter(g => g.id !== genre.id);
     } else {
       if (this.selectedGenres.length < 5) {
         this.selectedGenres.push(genre);
+      } else {
+        // Limite de 5 gêneros já selecionados
+        // Você pode exibir uma mensagem para o usuário aqui
+      }
+    }
+    genre.selected = !genre.selected;
+  }
+  toggle1Selection(genre: Genre): void {
+    if (genre.selected) {
+      this.leastfavoriteselectedGenres = this.leastfavoriteselectedGenres.filter(g => g.id !== genre.id);
+    } else {
+      if (this.leastfavoriteselectedGenres.length < 5) {
+        this.leastfavoriteselectedGenres.push(genre);
       } else {
         // Limite de 5 gêneros já selecionados
         // Você pode exibir uma mensagem para o usuário aqui

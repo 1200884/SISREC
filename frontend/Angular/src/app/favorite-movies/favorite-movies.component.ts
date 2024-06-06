@@ -26,7 +26,6 @@ export class FavoriteMoviesComponent {
     this.carregarFavoriteMovies();
     console.log("future appoitnments ->" + this.favoriteMovies)
   }
-
   carregarFavoriteMovies() {
     this.userEmail = this.authService.getUserEmail();
     this.authService.getFavorites(this.userEmail).subscribe(

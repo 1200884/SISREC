@@ -19,9 +19,7 @@ export class PastRatingsComponent {
 
   userEmail = this.authService.getUserEmail();
 
-  constructor(private appointmentService: AppointmentService, private authService: AuthService, private router: Router
-    
-  ) { }
+  constructor(private appointmentService: AppointmentService, private authService: AuthService, private router: Router  ) { }
 
   ngOnInit() {
     this.carregarPastRatings();
@@ -29,19 +27,18 @@ export class PastRatingsComponent {
   }
 
   carregarPastRatings() {
-        this.authService.getHistoryRatings().subscribe(
-        (movies: string[]) => {
-          this.pastRatings = movies;
-          console.log("past ratings -> "+ this.pastRatings);
-  
-        },
-        error => {
-          console.error('Erro ao carregar os filmes favoritos:', error);
-        }
-      );
-    
-    }
-    goBack(){
-      this.router.navigate(['/profile'])
-    }
+    this.authService.getHistoryRatings().subscribe(
+      (movies: string[]) => {
+        this.pastRatings = movies;
+        console.log("past ratings -> " + this.pastRatings);
+      },
+      error => {
+        console.error('Erro ao carregar os filmes favoritos:', error);
+      }
+    );
+
+  }
+  goBack() {
+    this.router.navigate(['/profile'])
+  }
 }

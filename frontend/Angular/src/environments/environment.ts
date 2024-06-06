@@ -16,7 +16,10 @@ export const environment = {
   USERS_URL: "/users",
   USERSGENRES_URL:"/users/genres",
   LOGIN_URL: "/users/login",
-  RECOMMENDATIONSNONPERSONALIZED: "/recommendation/nonpersonalized",
+  RECOMMENDATIONSNONPERSONALIZED: "/recommendation/nonpersonalizedOverall",
+  RECOMMENDATIONSNONPERSONALIZEDYEAR: "/recommendation/nonpersonalizedYear",
+  RECOMMENDATIONSNONPERSONALIZEDGENRE: "/recommendation/nonpersonalizedGenre",
+  RECOMMENDATIONSNONPERSONALIZEDDECADE: "/recommendation/nonpersonalizedDecade",
   MOVIESSEARCH:"/movies/search/",
   RATINGS_URL:"/ratings/"
 };

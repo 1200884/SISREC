@@ -22,7 +22,6 @@ export class ReservationsComponent implements AfterViewInit {
   constructor(private userService: AuthService, private appointmentService: AppointmentService, private dialog: MatDialog) {
     this.userEmail = this.userService.getUserEmail();
   }
-
   ngAfterViewInit() {
     this.appointmentService.getAppointmentsFromPlace('Solario 1').subscribe(appointments => {
       this.appointments = appointments;

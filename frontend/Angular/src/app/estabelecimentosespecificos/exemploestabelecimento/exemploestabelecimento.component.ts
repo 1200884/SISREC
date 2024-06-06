@@ -13,7 +13,6 @@ export class ExemploestabelecimentoComponent {
   image: string = '';
 
   constructor(private placesService: PlacesService, private router: Router) { }
-
   ngOnInit() {
     this.carregarSolario();
   }
