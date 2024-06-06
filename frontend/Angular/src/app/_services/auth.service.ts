@@ -130,6 +130,18 @@ export class AuthService {
   {
     return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONSNONPERSONALIZED);
   }
+  getMoviesNonPersonalizedGenre(genre:string):Observable<Movie[]>
+  {
+    return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONSNONPERSONALIZEDGENRE+"/"+genre);
+  }
+  getMoviesNonPersonalizedYear(year:string):Observable<Movie[]>
+  {
+    return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONSNONPERSONALIZEDYEAR+"/"+year);
+  }
+  getMoviesNonPersonalizedDecade(decade:string):Observable<Movie[]>
+  {
+    return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONSNONPERSONALIZEDDECADE+"/"+decade);
+  }
   getPersonalizedMovies(searchquery:string):Observable<Movie[]>
   {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.MOVIESSEARCH+searchquery)}
 

@@ -17,7 +17,6 @@ export class FavoritosComponent {
   ngOnInit() {
     this.carregarSolarios();
   }
-
   carregarSolarios() {
     this.authService.getFavorites(this.authService.getUserEmail()).subscribe(
       (data: any) => {

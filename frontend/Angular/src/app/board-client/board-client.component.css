@@ -30,10 +30,44 @@ h2 {
   margin-top: 10px;
   font-weight: bold;
   font-size: 20px;
+  width: 250px; /* Defina o comprimento fixo desejado */
+  white-space: nowrap; /* Garante que o texto não irá quebrar para uma nova linha */
+  overflow: hidden; /* Oculta o excesso de texto que não cabe no contêiner */
+  text-overflow: ellipsis; /* Adiciona "..." no final do texto que não cabe */
 }
+
 .movie-nelson {
   margin-top: 10px;
   font-weight: bold;
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 
+}.filter-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filter-container label {
+  margin-right: 10px;
+}
+
+.filter-container select,
+.filter-container input {
+  margin-right: 20px;
+  padding: 5px;
+}
+.no-movies-container {
+  display: flex;
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: center; /* Centraliza verticalmente */
+  height: 100%; /* Ajusta a altura conforme necessário */
+  min-height: 200px; /* Ajusta a altura mínima conforme necessário */
+}
+
+.no-movies-text {
+  margin-top: 200px;
+  text-align: center; /* Centraliza o texto */
+  font-size: 50px; /* Ajusta o tamanho da fonte conforme necessário */
+  font-weight: bold; /* Ajusta o peso da fonte conforme necessário */
 }

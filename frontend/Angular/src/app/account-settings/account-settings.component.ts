@@ -8,8 +8,8 @@ import { Router } from '@angular/router';
   templateUrl: './account-settings.component.html',
   styleUrls: ['./account-settings.component.css']
 })
-export class AccountSettingsComponent {
 
+export class AccountSettingsComponent {
   constructor(private appointmentService: AppointmentService, private authService: AuthService, private router: Router) { }
   userEmail = this.authService.getUserEmail();
   userName =this.authService.getName();

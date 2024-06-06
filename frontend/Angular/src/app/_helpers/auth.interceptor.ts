@@ -11,7 +11,6 @@ const TOKEN_HEADER_KEY = 'x-access-token';   // for Node.js Express back-end
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   constructor(private token: TokenStorageService) { }
-
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     console.log("intercept auth")
     let authReq = req;
