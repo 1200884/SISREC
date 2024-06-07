@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from sqlmodel import select
 from fastapi.responses import JSONResponse
 from models import *
 import pandas as pd
@@ -93,7 +94,12 @@ async def nonPersonalisedOverall():
     return movies_overall_best.to_dict(orient='records')
 
 @router.get("/personalizedColaborative/{user_id}", summary="Get personalized recommendations by colaborative filtering")
-async def personalisedColaborative(user_id: int):
+async def personalisedColaborative(*, session: AsyncSession = Depends(get_db),user_id: int):
+    query = select(Rating).where(Rating.user_id == user_id)
+    result = await session.execute(query)
+    rating = result.scalars().first()
+    if not rating:
+        raise HTTPException(status_code=404, detail="Ratings not found")
     script_dir = os.path.dirname(__file__)
     df = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/ratings.csv"))
     df_movies = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/movies_full_2.csv"))
