@@ -10,6 +10,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from fuzzywuzzy import process
 import numpy as np
 from scipy.sparse import csr_matrix
+from sklearn.feature_extraction.text import CountVectorizer
 load_dotenv()
 
 router = APIRouter(prefix='/recommendation', tags=['Recomendation'])
@@ -141,10 +142,68 @@ async def personalisedColaborative(user_id: int):
 
 @router.get("/personalizedContent", summary="Get personalized recommendations by content filtering")
 async def personalisedContent():
-    return {"message": "Personalized recommendations"}
+    script_dir = os.path.dirname(__file__)
+    movies_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/movies_full_2.csv"))
+    ratings_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/ratings.csv"))
+    movies_rating_user_df = pd.merge(movies_df, ratings_df, on="movieId", how="inner")
+    movies_rating_df = movies_rating_user_df[['movieId', 'title', 'rating', 'genres', 'year']].groupby(['movieId', 'title', 'genres', 'year'])['rating'].agg(['count', 'mean']).round(1)
+    movies_rating_df.sort_values('count', ascending=False, inplace=True)
+    movies_rating_df.rename(columns={'count' : 'Num_ratings', 'mean': 'Average_rating'}, inplace=True)
+
+    def calculate_weighted_rating(df, C, m):
+        df['Bayesian_rating'] = (df['Num_ratings'] / (df['Num_ratings'] + m)) * df['Average_rating'] + (m / (df['Num_ratings'] + m)) * C
+        return df
+    def find_movie_indices(df, title):
+        df_copy = df.copy()
+        df_copy['genres_str'] = df_copy['genres'].apply(lambda x: ' '.join(x))
+        count_vect = CountVectorizer()
+        genre_matrix = count_vect.fit_transform(df_copy['genres_str'])
+        cosine_sim = cosine_similarity(genre_matrix, genre_matrix)
+        idx = df_copy.index[df_copy['title'] == title].tolist()[0]
+        sim_scores = list(enumerate(cosine_sim[idx]))
+        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+        movie_indices = [i[0] for i in sim_scores]
+        movie_indices = movie_indices[1:20]
+        del df_copy
+        return movie_indices
+    def recommend_movies(df, movie_indices, preferred_genres=None, disliked_genres=None):
+        recommended_movies = []
+        for i in movie_indices:
+            movie_genres = set(df.loc[i, 'genres'])
+
+            if disliked_genres:
+                if movie_genres.intersection(set(disliked_genres)):
+                    continue
+
+            if preferred_genres:
+                if not movie_genres.intersection(set(preferred_genres)):
+                    continue
+        
+            recommended_movies.append(df.iloc[i]['title'])
+        
+            # Limit the number of recommended movies to 10
+            if len(recommended_movies) >= 5:
+                break
+    
+        return recommended_movies
+
+    C = round(ratings_df['rating'].mean(), 2)
+    movies_rating_df = calculate_weighted_rating(movies_rating_df, C, 500)
+    movies_rating_df.drop(columns='Average_rating', inplace=True)
+    movies_rating_df.sort_values(by='Bayesian_rating', ascending=False, inplace=True)
+    movies_rating_df.reset_index(inplace=True)
+    movies_rating_df['genres'] = movies_rating_df['genres'].str.split('|')
+
+    title = 'Toy Story'
+    preferred_genres = ['Adventure']
+    disliked_genres = ['Romance']
+
+    movie_indices_list = find_movie_indices(movies_rating_df, title)
+    recommended_movies = recommend_movies(movies_rating_df, movie_indices_list, preferred_genres, disliked_genres)
+    return recommended_movies
 
 @router.get("/personalizedHybrid", summary="Get personalized recommendations by hybrid filtering")
-async def personalisedContent():
+async def personalisedHybrid():
     return {"message": "Personalized recommendations"}
 
 def nonPersonalizedToFile():
