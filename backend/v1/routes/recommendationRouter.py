@@ -11,6 +11,10 @@ from fuzzywuzzy import process
 import numpy as np
 from scipy.sparse import csr_matrix
 from sklearn.feature_extraction.text import CountVectorizer
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends, HTTPException
+from models import *
+from database import *
 load_dotenv()
 
 router = APIRouter(prefix='/recommendation', tags=['Recomendation'])
@@ -141,18 +145,28 @@ async def personalisedColaborative(user_id: int):
     return movie_details
 
 @router.get("/personalizedContent", summary="Get personalized recommendations by content filtering")
-async def personalisedContent():
+async def personalisedContent(*, session: AsyncSession = Depends(get_db), title: str, user_id: int):
     script_dir = os.path.dirname(__file__)
     movies_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/movies_full_2.csv"))
     ratings_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/ratings.csv"))
-    movies_rating_user_df = pd.merge(movies_df, ratings_df, on="movieId", how="inner")
-    movies_rating_df = movies_rating_user_df[['movieId', 'title', 'rating', 'genres', 'year']].groupby(['movieId', 'title', 'genres', 'year'])['rating'].agg(['count', 'mean']).round(1)
-    movies_rating_df.sort_values('count', ascending=False, inplace=True)
-    movies_rating_df.rename(columns={'count' : 'Num_ratings', 'mean': 'Average_rating'}, inplace=True)
+    
+    def create_weighted_rating_df(movies_df, ratings_df):
+        movies_rating_user_df = pd.merge(movies_df, ratings_df, on="movieId", how="inner")
 
-    def calculate_weighted_rating(df, C, m):
-        df['Bayesian_rating'] = (df['Num_ratings'] / (df['Num_ratings'] + m)) * df['Average_rating'] + (m / (df['Num_ratings'] + m)) * C
-        return df
+        movies_rating_df = movies_rating_user_df[['movieId', 'title', 'rating', 'genres', 'year', 'url']].groupby(['movieId', 'title', 'genres', 'year', 'url'])['rating'].agg(['count', 'mean']).round(1)
+        movies_rating_df.sort_values('count', ascending=False, inplace=True)
+        movies_rating_df.rename(columns={'count' : 'Num_ratings', 'mean': 'Average_rating'}, inplace=True)
+
+        C = round(ratings_df['rating'].mean(), 2)
+        m = 500
+        movies_rating_df['Bayesian_rating'] = (movies_rating_df['Num_ratings'] / (movies_rating_df['Num_ratings'] + m)) * movies_rating_df['Average_rating'] + (m / (movies_rating_df['Num_ratings'] + m)) * C
+        movies_rating_df.drop(columns='Average_rating', inplace=True)
+        movies_rating_df.sort_values(by='Bayesian_rating', ascending=False, inplace=True)
+        movies_rating_df.rename(columns={'Num_ratings' : 'count', 'Bayesian_rating' : 'weighted_rating'}, inplace=True)
+        movies_rating_df.reset_index(inplace=True)
+        movies_rating_df['genres'] = movies_rating_df['genres'].str.split('|')
+        return movies_rating_df
+    
     def find_movie_indices(df, title):
         df_copy = df.copy()
         df_copy['genres_str'] = df_copy['genres'].apply(lambda x: ' '.join(x))
@@ -166,6 +180,7 @@ async def personalisedContent():
         movie_indices = movie_indices[1:20]
         del df_copy
         return movie_indices
+
     def recommend_movies(df, movie_indices, preferred_genres=None, disliked_genres=None):
         recommended_movies = []
         for i in movie_indices:
@@ -179,29 +194,29 @@ async def personalisedContent():
                 if not movie_genres.intersection(set(preferred_genres)):
                     continue
         
-            recommended_movies.append(df.iloc[i]['title'])
+            recommended_movies.append(i)
         
             # Limit the number of recommended movies to 10
             if len(recommended_movies) >= 5:
                 break
+
+        recommended_movies_df = df.loc[recommended_movies]
+        recommended_movies_df = recommended_movies_df[['title', 'year', 'url', 'count', 'weighted_rating']]
+        return recommended_movies_df
     
-        return recommended_movies
+    df = create_weighted_rating_df(movies_df, ratings_df)
 
-    C = round(ratings_df['rating'].mean(), 2)
-    movies_rating_df = calculate_weighted_rating(movies_rating_df, C, 500)
-    movies_rating_df.drop(columns='Average_rating', inplace=True)
-    movies_rating_df.sort_values(by='Bayesian_rating', ascending=False, inplace=True)
-    movies_rating_df.reset_index(inplace=True)
-    movies_rating_df['genres'] = movies_rating_df['genres'].str.split('|')
-
-    title = 'Toy Story'
-    preferred_genres = ['Adventure']
-    disliked_genres = ['Romance']
-
-    movie_indices_list = find_movie_indices(movies_rating_df, title)
-    recommended_movies = recommend_movies(movies_rating_df, movie_indices_list, preferred_genres, disliked_genres)
+    user = await session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="user not found")
+    preferred_genres = user.genresLike
+    disliked_genres = user.genresDislike
+ 
+    movie_indices_list = find_movie_indices(df, title)
+    recommended_movies = recommend_movies(df, movie_indices_list, preferred_genres, disliked_genres).to_dict(orient='records')
+    
     return recommended_movies
-
+    
 @router.get("/personalizedHybrid", summary="Get personalized recommendations by hybrid filtering")
 async def personalisedHybrid():
     return {"message": "Personalized recommendations"}
