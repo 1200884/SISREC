@@ -228,7 +228,7 @@ async def personalisedContent(*, session: AsyncSession = Depends(get_db), title:
     
     return recommended_movies
     
-@router.get("/personalizedKnowledge", summary="Get personalized recommendations by knowledge filtering")
+@router.get("/personalizedKnowledge/{user_id}", summary="Get personalized recommendations by knowledge filtering")
 async def personalisedknowledge(*, session: AsyncSession = Depends(get_db), user_id: int):
     script_dir = os.path.dirname(__file__)
     movies_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/movies_full_2.csv"))
