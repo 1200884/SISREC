@@ -49,4 +49,77 @@
     max-height: 300px; /* Defina um valor máximo para a altura, se necessário */
   }
   
+  .movie-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Centraliza o conteúdo horizontalmente */
+    margin-top: 100px;
+  }
+  
+  h2 {
+    text-align: center; /* Centraliza o título h2 */
+    margin-top: 50px;
+    font-size: 40px;
+  }
+  
+  .movie-item {
+    margin-right: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .movie-content {
+    text-align: center;
+  }
+  
+  .movie-image {
+    width: 150px; /* Defina a largura desejada para as imagens dos filmes */
+    height: 225px; /* Defina a altura desejada para as imagens dos filmes */
+    object-fit: cover; /* Garante que a imagem cubra o espaço especificado */
+  }
+  
+  .movie-title {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 20px;
+    width: 250px; /* Defina o comprimento fixo desejado */
+    white-space: nowrap; /* Garante que o texto não irá quebrar para uma nova linha */
+    overflow: hidden; /* Oculta o excesso de texto que não cabe no contêiner */
+    text-overflow: ellipsis; /* Adiciona "..." no final do texto que não cabe */
+  }
+  
+  .movie-nelson {
+    margin-top: 10px;
+    font-weight: bold;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  
+  }.filter-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .filter-container label {
+    margin-right: 10px;
+  }
+  
+  .filter-container select,
+  .filter-container input {
+    margin-right: 20px;
+    padding: 5px;
+  }
+  .no-movies-container {
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    height: 100%; /* Ajusta a altura conforme necessário */
+    min-height: 200px; /* Ajusta a altura mínima conforme necessário */
+  }
+  
+  .no-movies-text {
+    margin-top: 200px;
+    text-align: center; /* Centraliza o texto */
+    font-size: 50px; /* Ajusta o tamanho da fonte conforme necessário */
+    font-weight: bold; /* Ajusta o peso da fonte conforme necessário */
+  }
   

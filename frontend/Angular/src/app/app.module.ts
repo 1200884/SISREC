@@ -32,6 +32,7 @@ import { UserLoginComponent } from './user-login/user-login.component';
 import { FormsModule } from '@angular/forms';
 import { PersonalizedRecommendationsComponent } from './personalized-recommendations/personalized-recommendations.component';
 import { FavoriteGenresComponent } from './favorite-genres/favorite-genres.component';
+import { MoviessimilaarPerfilComponent } from './moviessimilaar-perfil/moviessimilaar-perfil.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { FavoriteGenresComponent } from './favorite-genres/favorite-genres.compo
     AccountSettingsComponent,
     UserLoginComponent,
     PersonalizedRecommendationsComponent,
-    FavoriteGenresComponent
+    FavoriteGenresComponent,
+    MoviessimilaarPerfilComponent
   ],
   imports: [
     BrowserModule,

@@ -22,5 +22,9 @@ export class ProfileComponent {
     // Redirecionar para a página de registro de funcionários
     this.router.navigate(['/account-settings']);
   }
+  similarMoviesPerfil() {
+    // Redirecionar para a página de registro de funcionários
+    this.router.navigate(['/moviessimilaar-perfil']);
+  }
 
 }

@@ -12,13 +12,61 @@ export class PersonalizedRecommendationsComponent {
   isDropdownOpen: boolean = false;
   searchQuery: string = '';
   movies: any[] = [];
+  personalizedMovies: any [] =[];
+  personalizedMoviesContent: any [] =[];
+  personalizedMoviesCollaborative: any [] =[];
   filteredMovies: any[] = [];
   isLoading: boolean = false;
   error: string | null = null;
   rating: number = 0;
+  title: any ='';
   selectedMovie: Movie | null = null; // Inicializando como null
   idMovie=this.selectedMovie?.id;
   constructor(private http: HttpClient, private authservice:AuthService) {}
+
+  ngOnInit() {
+    this.getPersonalizedMovies();
+
+  }
+  getTitle(){
+    this.title= this.selectedMovie?.title;
+    console.log(this.title)
+  }
+  getPersonalizedMovies() {
+    this.authservice.getPersonalizedHybrid(this.authservice.getUserId()).subscribe(
+      (pmovies: Movie[]) => {
+        this.personalizedMovies = pmovies;
+      },
+      (error) => {
+        console.error('Erro ao obter filmes personalizados:', error);
+        this.error = 'Ocorreu um erro ao obter filmes personalizados. Tente novamente mais tarde.';
+      }
+    );
+    console.log(this.personalizedMovies)
+  }
+  getPersonalizedContentMovies(){
+    this.authservice.getPersonalizedContent(this.authservice.getUserId(),this.title).subscribe(
+      (lmovies: Movie[]) => {
+        this.personalizedMoviesContent = lmovies;
+      },
+      (error) => {
+        console.error('Erro ao obter filmes personalizados:', error);
+        this.error = 'Ocorreu um erro ao obter filmes personalizados. Tente novamente mais tarde.';
+      }
+    );
+    console.log(this.personalizedMoviesContent)
+  }
+  getPersonalizedCollaborativeMovies(){
+    this.authservice.getPersonalizedCollaborative(this.authservice.getUserId()).subscribe(
+      (cmovies: Movie[]) => {
+        this.personalizedMoviesCollaborative = cmovies;
+      },
+      (error) => {
+        console.error('Erro ao obter filmes personalizados:', error);
+        this.error = 'Ocorreu um erro ao obter filmes personalizados. Tente novamente mais tarde.';
+      }
+    );
+  }
 
   searchMovies() {
     this.isLoading = true;
@@ -56,6 +104,8 @@ export class PersonalizedRecommendationsComponent {
     console.log('Movie selected:', movie);
     this.selectedMovie = movie; // Atualizando o selectedMovie com o filme selecionado
     console.log(this.selectedMovie?.url)
+    this.getTitle();
+    this.getPersonalizedContentMovies();
   }
   rateMovie(stars: number, movieId: number) {
     this.rating = stars;
