@@ -207,23 +207,36 @@ async def personalisedContent(*, session: AsyncSession = Depends(get_db), title:
 
     def recommend_movies(df, movie_indices, preferred_genres=None, disliked_genres=None):
         recommended_movies = []
+        neutral_movies = []
+
         for i in movie_indices:
             movie_genres = set(df.loc[i, 'genres'])
             print(movie_genres)
 
-            if disliked_genres:
-                if movie_genres.intersection(set(disliked_genres)):
-                    continue
+            # Skip movies with disliked genres
+            if disliked_genres and movie_genres.intersection(set(disliked_genres)):
+                continue
 
-            if preferred_genres:
-                if not movie_genres.intersection(set(preferred_genres)):
-                    continue
-        
-            recommended_movies.append(i)
-        
-            # Limit the number of recommended movies to 10
+            # Collect movies with preferred genres
+            if preferred_genres and movie_genres.intersection(set(preferred_genres)):
+                recommended_movies.append(i)
+            
+            # Collect neutral movies (no preferred or disliked genres)
+            elif preferred_genres and not movie_genres.intersection(set(preferred_genres)) and not movie_genres.intersection(set(disliked_genres)):
+                neutral_movies.append(i)
+            
+            # Limit the number of recommended movies to 5
             if len(recommended_movies) >= 5:
                 break
+
+        # If there are less than 5 recommended movies with preferred genres, add neutral movies
+        if len(recommended_movies) < 5:
+            for neutral_movie in neutral_movies:
+                recommended_movies.append(neutral_movie)
+                if len(recommended_movies) >= 5:
+                    break
+
+ 
 
         recommended_movies_df = df.loc[recommended_movies]
         recommended_movies_df = recommended_movies_df[['title', 'year', 'url', 'count', 'weighted_rating', 'genres']]
