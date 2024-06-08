@@ -160,8 +160,9 @@ async def personalisedContent(*, session: AsyncSession = Depends(get_db), title:
     script_dir = os.path.dirname(__file__)
     movies_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/movies_full_2.csv"))
     ratings_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/ratings.csv"))
+    tags_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/tags.csv"))
     
-    def create_weighted_rating_df(movies_df, ratings_df):
+    def create_weighted_rating_tags_df(movies_df, ratings_df, tags_df):
         movies_rating_user_df = pd.merge(movies_df, ratings_df, on="movieId", how="inner")
 
         movies_rating_df = movies_rating_user_df[['movieId', 'title', 'rating', 'genres', 'year', 'url']].groupby(['movieId', 'title', 'genres', 'year', 'url'])['rating'].agg(['count', 'mean']).round(1)
@@ -172,23 +173,35 @@ async def personalisedContent(*, session: AsyncSession = Depends(get_db), title:
         m = 500
         movies_rating_df['Bayesian_rating'] = (movies_rating_df['Num_ratings'] / (movies_rating_df['Num_ratings'] + m)) * movies_rating_df['Average_rating'] + (m / (movies_rating_df['Num_ratings'] + m)) * C
         movies_rating_df.drop(columns='Average_rating', inplace=True)
-        movies_rating_df.sort_values(by='Bayesian_rating', ascending=False, inplace=True)
         movies_rating_df.rename(columns={'Num_ratings' : 'count', 'Bayesian_rating' : 'weighted_rating'}, inplace=True)
         movies_rating_df.reset_index(inplace=True)
-        movies_rating_df['genres'] = movies_rating_df['genres'].str.split('|')
-        return movies_rating_df
+        
+
+        movies_rating_tags_df = pd.merge(movies_rating_df, tags_df, how='left', on='movieId')
+        movies_rating_tags_df['tag'] = movies_rating_tags_df['tag'].fillna(value='')
+        movies_rating_tags_df = movies_rating_tags_df.groupby(['movieId', 'title', 'genres', 'year', 'url', 'count', 'weighted_rating'])['tag'].apply(list).reset_index()
+        movies_rating_tags_df['genres'] = movies_rating_tags_df['genres'].str.split('|')
+        movies_rating_tags_df['tag'] = movies_rating_tags_df['tag'].apply(lambda x: [] if x == [float('nan')] else x)
+        movies_rating_tags_df.sort_values(by='weighted_rating', ascending=False, inplace=True)
+        return movies_rating_tags_df
     
     def find_movie_indices(df, title):
         df_copy = df.copy()
-        df_copy['genres_str'] = df_copy['genres'].apply(lambda x: ' '.join(x))
-        count_vect = CountVectorizer()
-        genre_matrix = count_vect.fit_transform(df_copy['genres_str'])
-        cosine_sim = cosine_similarity(genre_matrix, genre_matrix)
+        df_copy['features'] = df_copy['genres'] + df_copy['tag'] + df_copy['title'].apply(lambda x: [x])  # Add movie titles to features
+        
+        df_copy['features'] = df_copy['features'].apply(lambda x: ' '.join(x))  # Ensure 'features' is a string
+        
+        # TF-IDF Vectorization
+        tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+        tfidf_matrix = tfidf_vectorizer.fit_transform(df_copy['features'])
+        
+        # Calculate cosine similarity
+        cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
         idx = df_copy.index[df_copy['title'] == title].tolist()[0]
         sim_scores = list(enumerate(cosine_sim[idx]))
         sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
         movie_indices = [i[0] for i in sim_scores]
-        movie_indices = movie_indices[1:20]
+        movie_indices = movie_indices[1:30]
         del df_copy
         return movie_indices
 
@@ -196,6 +209,7 @@ async def personalisedContent(*, session: AsyncSession = Depends(get_db), title:
         recommended_movies = []
         for i in movie_indices:
             movie_genres = set(df.loc[i, 'genres'])
+            print(movie_genres)
 
             if disliked_genres:
                 if movie_genres.intersection(set(disliked_genres)):
@@ -212,10 +226,10 @@ async def personalisedContent(*, session: AsyncSession = Depends(get_db), title:
                 break
 
         recommended_movies_df = df.loc[recommended_movies]
-        recommended_movies_df = recommended_movies_df[['title', 'year', 'url', 'count', 'weighted_rating']]
+        recommended_movies_df = recommended_movies_df[['title', 'year', 'url', 'count', 'weighted_rating', 'genres']]
         return recommended_movies_df
     
-    df = create_weighted_rating_df(movies_df, ratings_df)
+    df = create_weighted_rating_tags_df(movies_df, ratings_df, tags_df)
 
     user = await session.get(User, user_id)
     if not user:
