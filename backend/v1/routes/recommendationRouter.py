@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from sqlmodel import select
 from fastapi.responses import JSONResponse
 from models import *
 import pandas as pd
@@ -6,6 +7,20 @@ import os
 import json
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
+from sklearn.metrics.pairwise import cosine_similarity
+from fuzzywuzzy import process
+import numpy as np
+from sqlalchemy import desc
+from scipy.sparse import csr_matrix
+from sklearn.feature_extraction.text import CountVectorizer
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends, HTTPException
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import linear_kernel
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.neighbors import NearestNeighbors
+from models import *
+from database import *
 load_dotenv()
 
 router = APIRouter(prefix='/recommendation', tags=['Recomendation'])
@@ -82,6 +97,308 @@ async def nonPersonalisedOverall():
     df = pd.read_csv(os.path.join(script_dir, "../utils/small_dataset/movies_rating.csv"))
     movies_overall_best = df[['movieId', 'title', 'url', 'count' ,'weighted_rating']].head(5)
     return movies_overall_best.to_dict(orient='records')
+
+@router.get("/personalizedColaborative/{user_id}", summary="Get personalized recommendations by colaborative filtering")
+async def personalisedColaborative(*, session: AsyncSession = Depends(get_db),user_id: int):
+    query = select(Rating).where(Rating.user_id == user_id)
+    result = await session.execute(query)
+    rating = result.scalars().first()
+    if not rating:
+        raise HTTPException(status_code=404, detail="Ratings not found")
+    script_dir = os.path.dirname(__file__)
+    df = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/ratings.csv"))
+    df_movies = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/movies_full_2.csv"))
+    M = df['userId'].nunique()
+    N = df['movieId'].nunique()
+
+    user_mapper = dict(zip(np.unique(df["userId"]), list(range(M))))
+    movie_mapper = dict(zip(np.unique(df["movieId"]), list(range(N))))
+    
+    user_inv_mapper = dict(zip(list(range(M)), np.unique(df["userId"])))
+    movie_inv_mapper = dict(zip(list(range(N)), np.unique(df["movieId"])))
+    
+    user_index = [user_mapper[i] for i in df['userId']]
+    item_index = [movie_mapper[i] for i in df['movieId']]
+
+    X = csr_matrix((df["rating"], (user_index,item_index)), shape=(M,N))
+    ser_index = user_mapper[user_id]
+    similarities = cosine_similarity(X[user_index], X)
+
+    similar_users_indices = similarities.argsort()[0][-5-1:-1][::-1]
+
+    recommended_movies = {}
+
+    for similar_user_index in similar_users_indices:
+        unrated_movies = np.where(np.logical_and(X[user_index].toarray()[0] == 0, X[similar_user_index].toarray()[0] != 0))[0]
+        
+        for movie_index in unrated_movies:
+            if movie_index not in recommended_movies:
+                recommended_movies[movie_index] = similarities[0, similar_user_index] * X[similar_user_index, movie_index]
+            else:
+                recommended_movies[movie_index] += similarities[0, similar_user_index] * X[similar_user_index, movie_index]
+
+    recommended_movies = sorted(recommended_movies.items(), key=lambda x: x[1], reverse=True)
+
+    recommended_movie_ids = [movie_inv_mapper[movie_index] for movie_index, _ in recommended_movies]
+
+    recommendations = recommended_movie_ids[:5]
+
+    movie_details = []
+    for movie_id in recommendations:
+        movie_info = df_movies.loc[movie_id, ['title', 'url', 'genres', 'imdbId', 'year']]
+        movie_details.append({
+            'title': movie_info['title'],
+            'url': movie_info['url'],
+            'genres': movie_info['genres'],
+            'imdbId': movie_info['imdbId'],
+            'year': movie_info['year']
+        })
+    return movie_details
+
+@router.get("/personalizedContent", summary="Get personalized recommendations by content filtering")
+async def personalisedContent(*, session: AsyncSession = Depends(get_db), title: str, user_id: int):
+    script_dir = os.path.dirname(__file__)
+    movies_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/movies_full_2.csv"))
+    ratings_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/ratings.csv"))
+    
+    def create_weighted_rating_df(movies_df, ratings_df):
+        movies_rating_user_df = pd.merge(movies_df, ratings_df, on="movieId", how="inner")
+
+        movies_rating_df = movies_rating_user_df[['movieId', 'title', 'rating', 'genres', 'year', 'url']].groupby(['movieId', 'title', 'genres', 'year', 'url'])['rating'].agg(['count', 'mean']).round(1)
+        movies_rating_df.sort_values('count', ascending=False, inplace=True)
+        movies_rating_df.rename(columns={'count' : 'Num_ratings', 'mean': 'Average_rating'}, inplace=True)
+
+        C = round(ratings_df['rating'].mean(), 2)
+        m = 500
+        movies_rating_df['Bayesian_rating'] = (movies_rating_df['Num_ratings'] / (movies_rating_df['Num_ratings'] + m)) * movies_rating_df['Average_rating'] + (m / (movies_rating_df['Num_ratings'] + m)) * C
+        movies_rating_df.drop(columns='Average_rating', inplace=True)
+        movies_rating_df.sort_values(by='Bayesian_rating', ascending=False, inplace=True)
+        movies_rating_df.rename(columns={'Num_ratings' : 'count', 'Bayesian_rating' : 'weighted_rating'}, inplace=True)
+        movies_rating_df.reset_index(inplace=True)
+        movies_rating_df['genres'] = movies_rating_df['genres'].str.split('|')
+        return movies_rating_df
+    
+    def find_movie_indices(df, title):
+        df_copy = df.copy()
+        df_copy['genres_str'] = df_copy['genres'].apply(lambda x: ' '.join(x))
+        count_vect = CountVectorizer()
+        genre_matrix = count_vect.fit_transform(df_copy['genres_str'])
+        cosine_sim = cosine_similarity(genre_matrix, genre_matrix)
+        idx = df_copy.index[df_copy['title'] == title].tolist()[0]
+        sim_scores = list(enumerate(cosine_sim[idx]))
+        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+        movie_indices = [i[0] for i in sim_scores]
+        movie_indices = movie_indices[1:20]
+        del df_copy
+        return movie_indices
+
+    def recommend_movies(df, movie_indices, preferred_genres=None, disliked_genres=None):
+        recommended_movies = []
+        for i in movie_indices:
+            movie_genres = set(df.loc[i, 'genres'])
+
+            if disliked_genres:
+                if movie_genres.intersection(set(disliked_genres)):
+                    continue
+
+            if preferred_genres:
+                if not movie_genres.intersection(set(preferred_genres)):
+                    continue
+        
+            recommended_movies.append(i)
+        
+            # Limit the number of recommended movies to 10
+            if len(recommended_movies) >= 5:
+                break
+
+        recommended_movies_df = df.loc[recommended_movies]
+        recommended_movies_df = recommended_movies_df[['title', 'year', 'url', 'count', 'weighted_rating']]
+        return recommended_movies_df
+    
+    df = create_weighted_rating_df(movies_df, ratings_df)
+
+    user = await session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="user not found")
+    preferred_genres = user.genresLike
+    disliked_genres = user.genresDislike
+ 
+    movie_indices_list = find_movie_indices(df, title)
+    recommended_movies = recommend_movies(df, movie_indices_list, preferred_genres, disliked_genres).to_dict(orient='records')
+    
+    return recommended_movies
+    
+@router.get("/personalizedKnowledge", summary="Get personalized recommendations by knowledge filtering")
+async def personalisedknowledge(*, session: AsyncSession = Depends(get_db), user_id: int):
+    script_dir = os.path.dirname(__file__)
+    movies_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/movies_full_2.csv"))
+    ratings_df = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/ratings.csv"))
+    
+    def create_weighted_rating_df(movies_df, ratings_df):
+        movies_rating_user_df = pd.merge(movies_df, ratings_df, on="movieId", how="inner")
+
+        movies_rating_df = movies_rating_user_df[['movieId', 'title', 'rating', 'genres', 'year', 'url']].groupby(['movieId', 'title', 'genres', 'year', 'url'])['rating'].agg(['count', 'mean']).round(1)
+        movies_rating_df.sort_values('count', ascending=False, inplace=True)
+        movies_rating_df.rename(columns={'count' : 'Num_ratings', 'mean': 'Average_rating'}, inplace=True)
+
+        C = round(ratings_df['rating'].mean(), 2)
+        m = 500
+        movies_rating_df['Bayesian_rating'] = (movies_rating_df['Num_ratings'] / (movies_rating_df['Num_ratings'] + m)) * movies_rating_df['Average_rating'] + (m / (movies_rating_df['Num_ratings'] + m)) * C
+        movies_rating_df.drop(columns='Average_rating', inplace=True)
+        movies_rating_df.sort_values(by='Bayesian_rating', ascending=False, inplace=True)
+        movies_rating_df.rename(columns={'Num_ratings' : 'count', 'Bayesian_rating' : 'weighted_rating'}, inplace=True)
+        movies_rating_df.reset_index(inplace=True)
+        movies_rating_df['genres'] = movies_rating_df['genres'].str.split('|')
+        return movies_rating_df
+    
+    def recommend_movies_based_on_genres(df, preferred_genres=None, disliked_genres=None):
+        df_copy = df.copy()
+        recommended_movies_ids = []
+        
+        for idx, row in df_copy.iterrows():
+            movie_genres = set(row['genres'])
+            
+            # Check if the movie does not have any of the disliked genres
+            if disliked_genres:
+                if movie_genres.intersection(set(disliked_genres)):
+                    continue
+
+            # Check if the movie has any of the preferred genres
+            if preferred_genres:
+                if not movie_genres.intersection(set(preferred_genres)):
+                    continue
+            
+            # Add the movie to the list of recommendations
+            recommended_movies_ids.append(idx)
+            
+            # Limit the number of recommended movies to 10
+            if len(recommended_movies_ids) >= 5:
+                break
+
+        recommended_movies_df = df.loc[recommended_movies_ids]
+        recommended_movies_df = recommended_movies_df[['title', 'year', 'url', 'count', 'weighted_rating']]
+
+        return recommended_movies_df
+
+    user = await session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="user not found")
+    preferred_genres = user.genresLike
+    disliked_genres = user.genresDislike
+    df = create_weighted_rating_df(movies_df, ratings_df)
+
+    recommended_movies_df = recommend_movies_based_on_genres(df, preferred_genres, disliked_genres)
+    return recommended_movies_df.to_dict(orient='records')
+
+@router.get("/personalizedHybrid", summary="Get personalized recommendations by hybrid filtering")
+async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id: int):
+    script_dir = os.path.dirname(__file__)
+    movies = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/movies_full_2.csv"))
+    ratings = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/ratings.csv"))
+    tags = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/tags.csv"))
+    def create_weighted_rating_tags_df(movies_df, ratings_df, tags_df):
+        movies_rating_user_df = pd.merge(movies_df, ratings_df, on="movieId", how="inner")
+
+        movies_rating_df = movies_rating_user_df[['movieId', 'title', 'rating', 'genres', 'year', 'url']].groupby(['movieId', 'title', 'genres', 'year', 'url'])['rating'].agg(['count', 'mean']).round(1)
+        movies_rating_df.sort_values('count', ascending=False, inplace=True)
+        movies_rating_df.rename(columns={'count' : 'Num_ratings', 'mean': 'Average_rating'}, inplace=True)
+
+        C = round(ratings_df['rating'].mean(), 2)
+        m = 500
+        movies_rating_df['Bayesian_rating'] = (movies_rating_df['Num_ratings'] / (movies_rating_df['Num_ratings'] + m)) * movies_rating_df['Average_rating'] + (m / (movies_rating_df['Num_ratings'] + m)) * C
+        movies_rating_df.drop(columns='Average_rating', inplace=True)
+        movies_rating_df.rename(columns={'Num_ratings' : 'count', 'Bayesian_rating' : 'weighted_rating'}, inplace=True)
+        movies_rating_df.reset_index(inplace=True)
+        
+
+        movies_rating_tags_df = pd.merge(movies_rating_df, tags_df, how='left', on='movieId')
+        movies_rating_tags_df['tag'] = movies_rating_tags_df['tag'].fillna(value='')
+        movies_rating_tags_df = movies_rating_tags_df.groupby(['movieId', 'title', 'genres', 'year', 'url', 'count', 'weighted_rating'])['tag'].apply(list).reset_index()
+        movies_rating_tags_df['genres'] = movies_rating_tags_df['genres'].str.split('|')
+        movies_rating_tags_df['tag'] = movies_rating_tags_df['tag'].apply(lambda x: [] if x == [float('nan')] else x)
+        movies_rating_tags_df.sort_values(by='weighted_rating', ascending=False, inplace=True)
+        return movies_rating_tags_df
+    def knowledge_based_recommendation(df, user_preferences):
+        recommended_movies = df[df['genres'].apply(lambda x: isinstance(x, list) and any(genre in user_preferences['preferred_genres'] for genre in x))]
+
+        if user_preferences['disliked_genres']:
+            recommended_movies = recommended_movies[~recommended_movies['genres'].apply(lambda x: isinstance(x, list) and any(genre in user_preferences['disliked_genres'] for genre in x))]
+
+        return recommended_movies.head(3)['movieId'].tolist()
+    def content_based_recommendation(df, user_preferences):
+        df['features'] = df['genres'] + df['tag']
+        df['features'] = df['features'].apply(lambda x: ' '.join(x))
+        tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+        tfidf_matrix = tfidf_vectorizer.fit_transform(df['features'])
+        cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
+        similar_movies_indices = []
+        for movie_title in user_preferences['liked_movies']:
+            idx = df.index[df['title'] == movie_title][0]
+            similar_movies_indices.extend(cosine_sim[idx].argsort()[-2:-11:-1])  # Get top 10 similar movies
+        similar_movies_indices = list(set(similar_movies_indices) - set(df.index[df['title'].isin(user_preferences['liked_movies'])]))
+        return similar_movies_indices[:5]
+
+    def create_utility_matrix(df):
+        utility_matrix = df.pivot(index='userId', columns='movieId', values='rating').fillna(0)
+        return utility_matrix
+
+
+    def collaborative_filtering_recommendation(df, user_id, k, num_recommendations):
+        utility_matrix = create_utility_matrix(df)
+        
+        user_indices = {user_id: idx for idx, user_id in enumerate(utility_matrix.index)}
+        
+        if user_id not in user_indices:
+            print("User ID does not exist.")
+            return []
+        
+        user_similarity = cosine_similarity(utility_matrix)
+        
+        # Find k nearest neighbors for the target user
+        knn = NearestNeighbors(n_neighbors=k, metric='cosine')
+        knn.fit(user_similarity)
+        _, indices = knn.kneighbors([user_similarity[user_indices[user_id]]])
+        
+        neighbor_ratings = utility_matrix.iloc[indices[0]]
+        
+        item_ratings = neighbor_ratings.mean(axis=0)
+        
+        user_ratings = utility_matrix.loc[user_id]
+        recommended_items = item_ratings[user_ratings == 0].sort_values(ascending=False)
+
+        return recommended_items.index.tolist()[:num_recommendations]   
+
+    def hybrid_based_recommendation(knowledge_recommendations_ids, content_recommendations_ids, collaborative_recommendations_ids):
+
+        recommendations = knowledge_recommendations_ids+content_recommendations_ids+collaborative_recommendations_ids
+    
+        return recommendations
+    
+    movies_rating_tags_df = create_weighted_rating_tags_df(movies, ratings, tags)
+    user = await session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="user not found")
+    preferred_genres = user.genresLike
+    disliked_genres = user.genresDislike
+    user_preferences = {'preferred_genres': preferred_genres, 'disliked_genres': disliked_genres}
+
+    k_recommendations_ids = knowledge_based_recommendation(movies_rating_tags_df, user_preferences)
+
+    ratings_user = ratings[ratings['userId'] == user_id]
+
+    titles_ids = ratings_user['movieId'].tail(3).tolist()
+
+    title_list = movies_rating_tags_df[movies_rating_tags_df['movieId'].isin(titles_ids)]['title'].tolist()
+
+    user_preferences_movies = {'liked_movies': title_list}
+
+    content_based_recommendations_ids = content_based_recommendation(movies_rating_tags_df, user_preferences_movies)
+
+    collaborative_filtering_recommendations_ids = collaborative_filtering_recommendation(ratings, user_id, 3, 6)
+
+    recommendations_hybrid = hybrid_based_recommendation(k_recommendations_ids,content_based_recommendations_ids, collaborative_filtering_recommendations_ids)
+
+    return movies_rating_tags_df.loc[recommendations_hybrid].to_dict(orient='records')
 
 def nonPersonalizedToFile():
     script_dir = os.path.dirname(__file__)
