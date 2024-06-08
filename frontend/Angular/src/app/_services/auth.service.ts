@@ -145,6 +145,16 @@ export class AuthService {
   {
     return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONSNONPERSONALIZEDDECADE+"/"+decade);
   }
+  getPersonalizedCollaborative(userId:string):Observable<Movie[]>
+  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDCONTENT+userId)}
+  getPersonalizedContent(searchquery:string):Observable<Movie[]>
+  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDCONTENT)}
+  getPersonalizedKnowledge(searchquery:string):Observable<Movie[]>
+  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDKNOWLEDGE)}
+  getPersonalizedHybrid(searchquery:string):Observable<Movie[]>
+  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDHYBRID)}
+
+
   getPersonalizedMovies(searchquery:string):Observable<Movie[]>
   {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.MOVIESSEARCH+searchquery)}
 

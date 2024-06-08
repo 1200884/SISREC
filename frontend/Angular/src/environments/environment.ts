@@ -20,6 +20,10 @@ export const environment = {
   RECOMMENDATIONSNONPERSONALIZEDYEAR: "/recommendation/nonpersonalizedYear",
   RECOMMENDATIONSNONPERSONALIZEDGENRE: "/recommendation/nonpersonalizedGenre",
   RECOMMENDATIONSNONPERSONALIZEDDECADE: "/recommendation/nonpersonalizedDecade",
+  RECOMMENDATIONPERSONALIZEDCOLLABORATIVE:"/recommendation/personalizedCollaborative",
+  RECOMMENDATIONPERSONALIZEDCONTENT:"/recommendation/personalizedContent",
+  RECOMMENDATIONPERSONALIZEDKNOWLEDGE:"/recommendation/personalizedKnowledge",
+  RECOMMENDATIONPERSONALIZEDHYBRID:"/recommendation/personalizedHybrid",
   MOVIESSEARCH:"/movies/search/",
   RATINGS_URL:"/ratings/"
 };
