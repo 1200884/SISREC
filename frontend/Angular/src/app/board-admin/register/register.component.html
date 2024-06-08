@@ -18,12 +18,16 @@
     </div>-->
     <button type="submit" class="btn btn-primary">Register</button>
     <button class="btn btn-primary" (click)="goBack(); hideRegistrationForm()">Go back</button>
+
     <div *ngIf="registrationAttempted">
-      <div *ngIf="isSuccessful" class="alert alert-success">
-        {{errorMessage}}
+      <div *ngIf="isSuccessful === null || isSuccessful === true">
+        <button class="btn btn-primary" type="button" disabled>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Loading...
+        </button>
       </div>
-      <div *ngIf="!isSuccessful" class="alert alert-success">
-        {{errorMessage}}
+      <div *ngIf="isSuccessful === false" class="alert alert-danger">
+        {{ errorMessage }}
       </div>
     </div>
   </form>

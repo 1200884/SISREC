@@ -21,7 +21,7 @@
 </div>
 
 <div  class="nelson" *ngIf="selectedGenres.length < 3" style="color: red;">
-  At least 3 favourite genres should be selected
+  At least 3 favourite genres should be selected!
 </div>
 <div class="nelson">
 <button *ngIf="selectedGenres.length >= 3" (click)="submitGenres()">Submit</button>

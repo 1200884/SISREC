@@ -10,6 +10,16 @@
       <input type="password" id="password" name="password" [(ngModel)]="password" required>
     </div>
     <button type="submit">Login</button>
-    <div *ngIf="loginError" class="error-message" style="color: red;">{{ loginerror }}</div>
+    <div *ngIf="registrationAttempted">
+      <div *ngIf="isSuccessful === null">
+        <button class="btn btn-primary" type="button" disabled>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Loading...
+        </button>
+      </div>
+      <div *ngIf="isSuccessful === false" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+    </div>
   </form>
 </div>
