@@ -92,8 +92,9 @@ export class FavoriteGenresComponent {
       return;
     }
     const selectedGenreNames: string[] = this.selectedGenres.map(genre => genre.name);
+    const leastselectedGenreNames: string[] = this.leastfavoriteselectedGenres.map(genre1 => genre1.name);
 
-    this.authService.registerGenres(selectedGenreNames).subscribe(
+    this.authService.registerGenres(selectedGenreNames,leastselectedGenreNames).subscribe(
       (success: boolean) => {
         if (success) {
           // Lógica adicional para lidar com o sucesso

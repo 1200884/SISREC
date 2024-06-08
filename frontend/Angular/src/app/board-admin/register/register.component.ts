@@ -17,7 +17,8 @@ export class RegisterComponent implements OnInit {
     password: null
 
   };
-  isSuccessful = false;
+  isRegistering =true;
+  isSuccessful = true;
   isSignUpFailed = false;
   errorMessage = '';
   isRegistrationFormVisible=false;
@@ -56,7 +57,13 @@ export class RegisterComponent implements OnInit {
         } else {
           this.errorMessage = 'Ocorreu um erro durante o registo. Tente novamente mais tarde.';
         }
-  
+        this.isSuccessful = false;
+
+        setTimeout(() => {
+          console.log("nelson")
+          this.isSuccessful==null;
+        }, 5000);
+
         this.isSignUpFailed = true;
       }
     );

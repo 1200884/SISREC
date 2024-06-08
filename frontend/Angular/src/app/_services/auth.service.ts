@@ -62,10 +62,13 @@ export class AuthService {
   getUserId():number{
     return this.userid;
   }
-  registerGenres(selectedGenres: any[]): Observable<boolean> {
-    
+  registerGenres(selectedGenres: any[],leastfavoriteselectedGenres: any[]): Observable<boolean> {
+    const body = {
+      genresLike: selectedGenres,
+      genresDislike: leastfavoriteselectedGenres
+    };
     console.log("email ->"+ this.newuseremail)
-    return this.http.post<boolean>(environment.BACKEND_URL_LOCAL + environment.USERSGENRES_URL+"/"+this.newuseremail,  selectedGenres);
+    return this.http.post<boolean>(environment.BACKEND_URL_LOCAL + environment.USERSGENRES_URL+"/"+this.newuseremail, body);
   }
   register(userRegister: UserRegister | undefined): Observable<boolean> {
     return this.http.post<UserRegister>(environment.BACKEND_URL_LOCAL + environment.USERS_URL, userRegister).pipe(
@@ -142,6 +145,16 @@ export class AuthService {
   {
     return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONSNONPERSONALIZEDDECADE+"/"+decade);
   }
+  getPersonalizedCollaborative(userId:string):Observable<Movie[]>
+  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDCONTENT+userId)}
+  getPersonalizedContent(searchquery:string):Observable<Movie[]>
+  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDCONTENT)}
+  getPersonalizedKnowledge(searchquery:string):Observable<Movie[]>
+  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDKNOWLEDGE)}
+  getPersonalizedHybrid(searchquery:string):Observable<Movie[]>
+  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDHYBRID)}
+
+
   getPersonalizedMovies(searchquery:string):Observable<Movie[]>
   {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.MOVIESSEARCH+searchquery)}
 
