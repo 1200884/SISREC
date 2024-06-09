@@ -13,6 +13,7 @@ export class AccountSettingsComponent {
   constructor(private appointmentService: AppointmentService, private authService: AuthService, private router: Router) { }
   userEmail = this.authService.getUserEmail();
   userName =this.authService.getName();
+  
   userPhoneNumber = this.authService.getPhoneNumber();
   
   goBack(){
