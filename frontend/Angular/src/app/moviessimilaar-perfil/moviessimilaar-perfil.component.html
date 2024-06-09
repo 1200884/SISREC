@@ -1,5 +1,5 @@
-<div class="personalized-movies-container" *ngIf="personalizedMovies.length > 0">
-    <h3>Personalized Recommendations</h3>
+<div class="personalized-movies-container" *ngIf="personalizedMoviesCollaborative.length > 0">
+    <h2>Personalized Recommendations</h2>
     <div class="movie-list">
       <div *ngFor="let movie of personalizedMoviesCollaborative" class="movie-item"(click)="selectMovie(movie)">
         <div class="movie-content">
