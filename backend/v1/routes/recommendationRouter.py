@@ -483,7 +483,7 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
     
     def hybrid_based_recommendation(knowledge_recommendations_ids, content_recommendations_ids, collaborative_recommendations_ids):
 
-        knowledge_weight = 0.2
+        knowledge_weight = 0.4
         content_weight =    1
         collaborative_weight = 1
 
@@ -527,7 +527,7 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
     disliked_genres = user.genresDislike
     user_preferences = {'preferred_genres': preferred_genres, 'disliked_genres': disliked_genres}
 
-    k_recommendations_ids = knowledge_based_recommendation(movies_rating_tags_df, user_preferences)
+    k_recommendations_ids = knowledge_based_recommendation(movies_rating_tags_df_without_history, user_preferences)
     print(k_recommendations_ids)
 
     ratings_user = ratings[ratings['userId'] == user_id]
