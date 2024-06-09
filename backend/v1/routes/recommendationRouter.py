@@ -106,54 +106,119 @@ async def personalisedColaborative(*, session: AsyncSession = Depends(get_db),us
     if not rating:
         raise HTTPException(status_code=404, detail="Ratings not found")
     script_dir = os.path.dirname(__file__)
-    df = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/ratings.csv"))
-    df_movies = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/movies_full_2.csv"))
-    M = df['userId'].nunique()
-    N = df['movieId'].nunique()
-
-    user_mapper = dict(zip(np.unique(df["userId"]), list(range(M))))
-    movie_mapper = dict(zip(np.unique(df["movieId"]), list(range(N))))
+    ratings = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/ratings.csv"))
+    movies = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/movies_full_2.csv"))
+    tags = pd.read_csv(os.path.join(script_dir, "../recommender/dataset/small_dataset/tags.csv"))
     
-    user_inv_mapper = dict(zip(list(range(M)), np.unique(df["userId"])))
-    movie_inv_mapper = dict(zip(list(range(N)), np.unique(df["movieId"])))
+
+    # M = df['userId'].nunique()
+    # N = df['movieId'].nunique()
+
+    # user_mapper = dict(zip(np.unique(df["userId"]), list(range(M))))
+    # movie_mapper = dict(zip(np.unique(df["movieId"]), list(range(N))))
     
-    user_index = [user_mapper[i] for i in df['userId']]
-    item_index = [movie_mapper[i] for i in df['movieId']]
+    # user_inv_mapper = dict(zip(list(range(M)), np.unique(df["userId"])))
+    # movie_inv_mapper = dict(zip(list(range(N)), np.unique(df["movieId"])))
+    
+    # user_index = [user_mapper[i] for i in df['userId']]
+    # item_index = [movie_mapper[i] for i in df['movieId']]
 
-    X = csr_matrix((df["rating"], (user_index,item_index)), shape=(M,N))
-    ser_index = user_mapper[user_id]
-    similarities = cosine_similarity(X[user_index], X)
+    # X = csr_matrix((df["rating"], (user_index,item_index)), shape=(M,N))
+    # ser_index = user_mapper[user_id]
+    # similarities = cosine_similarity(X[user_index], X)
 
-    similar_users_indices = similarities.argsort()[0][-5-1:-1][::-1]
+    # similar_users_indices = similarities.argsort()[0][-5-1:-1][::-1]
 
-    recommended_movies = {}
+    # recommended_movies = {}
 
-    for similar_user_index in similar_users_indices:
-        unrated_movies = np.where(np.logical_and(X[user_index].toarray()[0] == 0, X[similar_user_index].toarray()[0] != 0))[0]
+    # for similar_user_index in similar_users_indices:
+    #     unrated_movies = np.where(np.logical_and(X[user_index].toarray()[0] == 0, X[similar_user_index].toarray()[0] != 0))[0]
         
-        for movie_index in unrated_movies:
-            if movie_index not in recommended_movies:
-                recommended_movies[movie_index] = similarities[0, similar_user_index] * X[similar_user_index, movie_index]
-            else:
-                recommended_movies[movie_index] += similarities[0, similar_user_index] * X[similar_user_index, movie_index]
+    #     for movie_index in unrated_movies:
+    #         if movie_index not in recommended_movies:
+    #             recommended_movies[movie_index] = similarities[0, similar_user_index] * X[similar_user_index, movie_index]
+    #         else:
+    #             recommended_movies[movie_index] += similarities[0, similar_user_index] * X[similar_user_index, movie_index]
 
-    recommended_movies = sorted(recommended_movies.items(), key=lambda x: x[1], reverse=True)
+    # recommended_movies = sorted(recommended_movies.items(), key=lambda x: x[1], reverse=True)
 
-    recommended_movie_ids = [movie_inv_mapper[movie_index] for movie_index, _ in recommended_movies]
+    # recommended_movie_ids = [movie_inv_mapper[movie_index] for movie_index, _ in recommended_movies]
 
-    recommendations = recommended_movie_ids[:5]
+    # recommendations = recommended_movie_ids[:5]
 
-    movie_details = []
-    for movie_id in recommendations:
-        movie_info = df_movies.loc[movie_id, ['title', 'url', 'genres', 'imdbId', 'year']]
-        movie_details.append({
-            'title': movie_info['title'],
-            'url': movie_info['url'],
-            'genres': movie_info['genres'],
-            'imdbId': movie_info['imdbId'],
-            'year': movie_info['year']
-        })
-    return movie_details
+    # movie_details = []
+    # for movie_id in recommendations:
+    #     movie_info = df_movies.loc[movie_id, ['title', 'url', 'genres', 'imdbId', 'year']]
+    #     movie_details.append({
+    #         'title': movie_info['title'],
+    #         'url': movie_info['url'],
+    #         'genres': movie_info['genres'],
+    #         'imdbId': movie_info['imdbId'],
+    #         'year': movie_info['year']
+    #     })
+    # return movie_details
+
+
+    def create_weighted_rating_tags_df(movies_df, ratings_df, tags_df):
+        movies_rating_user_df = pd.merge(movies_df, ratings_df, on="movieId", how="inner")
+
+        movies_rating_df = movies_rating_user_df[['movieId', 'title', 'rating', 'genres', 'year', 'url']].groupby(['movieId', 'title', 'genres', 'year', 'url'])['rating'].agg(['count', 'mean']).round(1)
+        movies_rating_df.sort_values('count', ascending=False, inplace=True)
+        movies_rating_df.rename(columns={'count' : 'Num_ratings', 'mean': 'Average_rating'}, inplace=True)
+
+        C = round(ratings_df['rating'].mean(), 2)
+        m = 500
+        movies_rating_df['Bayesian_rating'] = (movies_rating_df['Num_ratings'] / (movies_rating_df['Num_ratings'] + m)) * movies_rating_df['Average_rating'] + (m / (movies_rating_df['Num_ratings'] + m)) * C
+        movies_rating_df.drop(columns='Average_rating', inplace=True)
+        movies_rating_df.rename(columns={'Num_ratings' : 'count', 'Bayesian_rating' : 'weighted_rating'}, inplace=True)
+        movies_rating_df.reset_index(inplace=True)
+        
+
+        movies_rating_tags_df = pd.merge(movies_rating_df, tags_df, how='left', on='movieId')
+        movies_rating_tags_df['tag'] = movies_rating_tags_df['tag'].fillna(value='')
+        movies_rating_tags_df = movies_rating_tags_df.groupby(['movieId', 'title', 'genres', 'year', 'url', 'count', 'weighted_rating'])['tag'].apply(list).reset_index()
+        movies_rating_tags_df['genres'] = movies_rating_tags_df['genres'].str.split('|')
+        movies_rating_tags_df['tag'] = movies_rating_tags_df['tag'].apply(lambda x: [] if x == [float('nan')] else x)
+        movies_rating_tags_df.sort_values(by='weighted_rating', ascending=False, inplace=True)
+        return movies_rating_tags_df
+    
+    def create_utility_matrix(df):
+        utility_matrix = df.pivot(index='userId', columns='movieId', values='rating').fillna(0)
+        return utility_matrix
+
+
+
+    def collaborative_filtering_recommendation(df, user_id, k, num_recommendations):
+        utility_matrix = create_utility_matrix(df)
+        user_indices = {user_id: idx for idx, user_id in enumerate(utility_matrix.index)}
+        if user_id not in user_indices:
+            print("User ID does not exist.")
+            return []
+        user_similarity = cosine_similarity(utility_matrix)
+        knn = NearestNeighbors(n_neighbors=k, metric='cosine')
+        knn.fit(user_similarity)
+        _, indices = knn.kneighbors([user_similarity[user_indices[user_id]]])
+        neighbor_ratings = utility_matrix.iloc[indices[0]]
+        item_ratings = neighbor_ratings.mean(axis=0)
+        user_ratings = utility_matrix.loc[user_id]
+        recommended_items = item_ratings[user_ratings == 0].sort_values(ascending=False).index.tolist()[:num_recommendations]
+        
+        # # Filter out recommended items based on user preferences
+        # if user_preferences['disliked_genres']:
+        #     df_filtered = movies_rating_tags_df[~movies_rating_tags_df['genres'].apply(lambda x: any(genre in user_preferences['disliked_genres'] for genre in x))]
+        #     recommended_items = [item for item in recommended_items if item in df_filtered['movieId']]
+        
+        return movies_rating_tags_df.loc[recommended_items, 'movieId'].tolist()
+    
+    movies_rating_tags_df = create_weighted_rating_tags_df(movies, ratings, tags)
+
+    movies_recomend_ids = collaborative_filtering_recommendation(ratings, user_id, 5, 5)
+
+    movies_recomend_df = movies_rating_tags_df[movies_rating_tags_df['movieId'].isin(movies_recomend_ids)]
+    
+    return movies_recomend_df.to_dict(orient='records')
+
+
 
 @router.get("/personalizedContent", summary="Get personalized recommendations by content filtering")
 async def personalisedContent(*, session: AsyncSession = Depends(get_db), title: str, user_id: int):
