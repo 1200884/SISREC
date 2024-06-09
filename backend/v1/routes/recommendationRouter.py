@@ -21,6 +21,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.neighbors import NearestNeighbors
 from models import *
 from database import *
+from scipy.sparse import csr_matrix
 load_dotenv()
 
 router = APIRouter(prefix='/recommendation', tags=['Recomendation'])
@@ -449,33 +450,73 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
             similar_movies_indices = [idx for idx in similar_movies_indices if not any(genre in disliked_genres for genre in df.loc[idx, 'genres'])]
         return df.loc[similar_movies_indices[:10], 'movieId'].tolist()
 
-    def create_utility_matrix(df):
-        utility_matrix = df.pivot(index='userId', columns='movieId', values='rating').fillna(0)
-        return utility_matrix
+    # def create_utility_matrix(df):
+    #     utility_matrix = df.pivot(index='userId', columns='movieId', values='rating').fillna(0)
+    #     return utility_matrix
 
 
-    def collaborative_filtering_recommendation(df, user_id, k, num_recommendations):
-        utility_matrix = create_utility_matrix(df)
-        user_indices = {user_id: idx for idx, user_id in enumerate(utility_matrix.index)}
-        if user_id not in user_indices:
-            print("User ID does not exist.")
-            return []
-        user_similarity = cosine_similarity(utility_matrix)
-        knn = NearestNeighbors(n_neighbors=k, metric='cosine')
-        knn.fit(user_similarity)
-        _, indices = knn.kneighbors([user_similarity[user_indices[user_id]]])
-        neighbor_ratings = utility_matrix.iloc[indices[0]]
-        item_ratings = neighbor_ratings.mean(axis=0)
-        user_ratings = utility_matrix.loc[user_id]
-        recommended_items = item_ratings[user_ratings == 0].sort_values(ascending=False).index.tolist()[:num_recommendations]
+    # def collaborative_filtering_recommendation(df, user_id, k, num_recommendations):
+    #     utility_matrix = create_utility_matrix(df)
+    #     user_indices = {user_id: idx for idx, user_id in enumerate(utility_matrix.index)}
+    #     if user_id not in user_indices:
+    #         print("User ID does not exist.")
+    #         return []
+    #     user_similarity = cosine_similarity(utility_matrix)
+    #     knn = NearestNeighbors(n_neighbors=k, metric='cosine')
+    #     knn.fit(user_similarity)
+    #     _, indices = knn.kneighbors([user_similarity[user_indices[user_id]]])
+    #     neighbor_ratings = utility_matrix.iloc[indices[0]]
+    #     item_ratings = neighbor_ratings.mean(axis=0)
+    #     user_ratings = utility_matrix.loc[user_id]
+    #     recommended_items = item_ratings[user_ratings == 0].sort_values(ascending=False).index.tolist()[:num_recommendations]
         
         # # Filter out recommended items based on user preferences
         # if user_preferences['disliked_genres']:
         #     df_filtered = movies_rating_tags_df[~movies_rating_tags_df['genres'].apply(lambda x: any(genre in user_preferences['disliked_genres'] for genre in x))]
         #     recommended_items = [item for item in recommended_items if item in df_filtered['movieId']]
         
-        return movies_rating_tags_df.loc[recommended_items, 'movieId'].tolist()
- 
+        #return movies_rating_tags_df.loc[recommended_items, 'movieId'].tolist()
+
+
+    def create_X(df):
+       
+        M = df['userId'].nunique()
+        N = df['movieId'].nunique()
+
+        user_mapper = dict(zip(np.unique(df["userId"]), list(range(M))))
+        movie_mapper = dict(zip(np.unique(df["movieId"]), list(range(N))))
+        
+        user_inv_mapper = dict(zip(list(range(M)), np.unique(df["userId"])))
+        movie_inv_mapper = dict(zip(list(range(N)), np.unique(df["movieId"])))
+        
+        user_index = [user_mapper[i] for i in df['userId']]
+        item_index = [movie_mapper[i] for i in df['movieId']]
+
+        X = csr_matrix((df["rating"], (user_index,item_index)), shape=(M,N))
+        
+        return X, user_mapper, movie_mapper, user_inv_mapper, movie_inv_mapper
+
+    
+
+
+    def collaborative_filtering_recommendation(movie_id, X, movie_mapper, movie_inv_mapper, k, metric='cosine'):
+        X = X.T
+        neighbour_ids = []
+        
+        movie_ind = movie_mapper[movie_id]
+        movie_vec = X[movie_ind]
+        if isinstance(movie_vec, (np.ndarray)):
+            movie_vec = movie_vec.reshape(1,-1)
+        # use k+1 since kNN output includes the movieId of interest
+        kNN = NearestNeighbors(n_neighbors=k+1, algorithm="brute", metric=metric)
+        kNN.fit(X)
+        neighbour = kNN.kneighbors(movie_vec, return_distance=False)
+        for i in range(0,k):
+            n = neighbour.item(i)
+            neighbour_ids.append(movie_inv_mapper[n])
+        neighbour_ids.pop(0)
+        return neighbour_ids
+    
 
     # def hybrid_based_recommendation(knowledge_recommendations_ids, content_recommendations_ids, collaborative_recommendations_ids):
 
@@ -485,9 +526,9 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
     
     def hybrid_based_recommendation(knowledge_recommendations_ids, content_recommendations_ids, collaborative_recommendations_ids):
 
-        knowledge_weight = 1
+        knowledge_weight = 0.6
         content_weight =    0.8
-        collaborative_weight = 1
+        collaborative_weight = 0.8
 
         
         num_movies_per_technique_k = int(round(len(knowledge_recommendations_ids) * knowledge_weight))
@@ -543,7 +584,11 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
     content_based_recommendations_ids = content_based_recommendation(movies_rating_tags_df, user_preferences_movies, user_preferences)
     print(content_based_recommendations_ids)
 
-    collaborative_filtering_recommendations_ids = collaborative_filtering_recommendation(ratings, user_id, 5, 10)
+    X, user_mapper, movie_mapper, user_inv_mapper, movie_inv_mapper = create_X(ratings)
+
+    collaborative_filtering_recommendations_ids = collaborative_filtering_recommendation(1, X, movie_mapper, movie_inv_mapper, k=10)
+
+    
     print(collaborative_filtering_recommendations_ids)
 
 
