@@ -42,8 +42,9 @@
     <span *ngFor="let star of [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]" (click)="rateMovie(star, selectedMovie.movie_id)">
       <i class="fas fa-star" [class.active]="star <= rating"></i>
     </span>
-  </div>
-  <p>Your Rating: {{rating}} stars</p>
+    <div *ngIf="hasRated">
+      <p>Your Rating: {{rating}} stars</p>
+    </div>
 </div>
 
 
@@ -51,7 +52,7 @@
 <div class="personalized-content-movies-container" *ngIf="personalizedMoviesContent.length > 0">
   <h2>Movies Recommended Based on "{{ title }}"</h2>
   <div class="movie-list">
-    <div *ngFor="let movie of personalizedMoviesContent" class="movie-item">
+    <div *ngFor="let movie of personalizedMoviesContent"  class="movie-item"(click)="selectMovie(movie)">
       <div class="movie-content">
         <img [src]="movie.url" alt="Capa do Filme" class="movie-image">
         <div class="movie-title">{{ movie.title }}</div>

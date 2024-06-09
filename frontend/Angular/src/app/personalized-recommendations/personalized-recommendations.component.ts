@@ -20,9 +20,11 @@ export class PersonalizedRecommendationsComponent {
   error: string | null = null;
   rating: number = 0;
   title: any ='';
+  hasRated: boolean=false;
   selectedMovie: Movie | null = null; // Inicializando como null
   idMovie=this.selectedMovie?.movie_id;
   movieID: any = '';
+  numberofrates=0;
   constructor(private http: HttpClient, private authservice:AuthService) {}
 
   ngOnInit() {
@@ -103,6 +105,7 @@ export class PersonalizedRecommendationsComponent {
   }
 
   selectMovie(movie: any) {
+    this.hasRated=false;
     console.log('Movie selected:', movie);
     this.selectedMovie = movie; // Atualizando o selectedMovie com o filme selecionado
     console.log(this.selectedMovie?.url)
@@ -123,6 +126,9 @@ export class PersonalizedRecommendationsComponent {
 
   }
   rateMovie(stars: number, movieId: number) {
+    
+    this.hasRated= true;
+
     this.rating = stars;
     console.log(this.idMovie)
     console.log("fernando"+this.movieID)
