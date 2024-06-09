@@ -1,5 +1,5 @@
 export interface Movie{
-    id: number;
+    movie_id: number;
     title: string;
     count: number;
     mean: number;

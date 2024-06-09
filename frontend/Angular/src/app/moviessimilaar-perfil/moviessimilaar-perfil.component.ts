@@ -21,7 +21,7 @@ export class MoviessimilaarPerfilComponent {
   rating: number = 0;
   title: any ='';
   selectedMovie: Movie | null = null; // Inicializando como null
-  idMovie=this.selectedMovie?.id;
+  idMovie=this.selectedMovie?.movie_id;
   constructor(private http: HttpClient, private authservice:AuthService) {}
 
   ngOnInit() {
@@ -46,6 +46,11 @@ export class MoviessimilaarPerfilComponent {
     console.log(this.selectedMovie?.url)
     this.getTitle();
     this.getPersonalizedContentMovies();
+    console.log("title ->"+movie.title);
+    console.log("MovieId ->->"+movie.MovieId);
+    console.log("year->"+movie.year);
+    console.log("movie_id"+movie.movie_id)
+    
   }
   getTitle(){
     this.title= this.selectedMovie?.title;
