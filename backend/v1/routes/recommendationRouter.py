@@ -496,7 +496,14 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
         weighted_collaborative_recommendations = collaborative_recommendations_ids[:num_movies_per_technique] * collaborative_weight
         
         # Combine recommendations from all techniques
-        combined_recommendations = weighted_knowledge_recommendations + weighted_content_recommendations + weighted_collaborative_recommendations
+        # combined_recommendations = weighted_knowledge_recommendations + weighted_content_recommendations + weighted_collaborative_recommendations
+
+        # Combine recommendations into a single array
+        combined_recommendations = np.concatenate((
+            weighted_knowledge_recommendations, 
+            weighted_content_recommendations, 
+            weighted_collaborative_recommendations
+        ))
 
         combined_recommendations = list(set(combined_recommendations))
 
