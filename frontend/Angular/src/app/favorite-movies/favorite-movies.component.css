@@ -19,8 +19,10 @@
   h2 {
     text-align: center; /* Centraliza o título h2 */
     margin-top: 50px;
-    font-size: 40px;
+    font-size: 50px;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   }
+  
   
   .movie-item {
     margin-right: 20px;
