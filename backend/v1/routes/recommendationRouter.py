@@ -445,7 +445,7 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
         if user_preferences['disliked_genres']:
             disliked_genres = user_preferences['disliked_genres']
             similar_movies_indices = [idx for idx in similar_movies_indices if not any(genre in disliked_genres for genre in df.loc[idx, 'genres'])]
-        return df.loc[similar_movies_indices[:5], 'movieId'].tolist()
+        return df.loc[similar_movies_indices[:15], 'movieId'].tolist()
 
     def create_utility_matrix(df):
         utility_matrix = df.pivot(index='userId', columns='movieId', values='rating').fillna(0)
@@ -484,20 +484,24 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
     def hybrid_based_recommendation(knowledge_recommendations_ids, content_recommendations_ids, collaborative_recommendations_ids):
 
         knowledge_weight = 0.4
-        content_weight = 0.8
+        content_weight =    1
         collaborative_weight = 1
 
-        # Calculate the number of movies to be recommended from each technique
-        num_movies_per_technique = 5
+        
+        num_movies_per_technique_k = int(round(len(knowledge_recommendations_ids) * knowledge_weight))
+        num_movies_per_technique_c = int(round(len(content_recommendations_ids) * content_weight))
+        num_movies_per_technique_col = int(round(len(collaborative_recommendations_ids) * collaborative_weight))
+
         
         # Apply weights to each technique's recommendations
-        weighted_knowledge_recommendations = knowledge_recommendations_ids[:num_movies_per_technique] * knowledge_weight
-        weighted_content_recommendations = content_recommendations_ids[:num_movies_per_technique] * content_weight
-        weighted_collaborative_recommendations = collaborative_recommendations_ids[:num_movies_per_technique] * collaborative_weight
+        weighted_knowledge_recommendations = knowledge_recommendations_ids[:num_movies_per_technique_k] 
+        weighted_content_recommendations = content_recommendations_ids[:num_movies_per_technique_c] 
+        weighted_collaborative_recommendations = collaborative_recommendations_ids[:num_movies_per_technique_col] 
         
         # Combine recommendations from all techniques
         combined_recommendations = weighted_knowledge_recommendations + weighted_content_recommendations + weighted_collaborative_recommendations
 
+        
         combined_recommendations = list(set(combined_recommendations))
 
         
@@ -506,8 +510,14 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
         
         return combined_recommendations
     
+
+    rated_movie_ids = ratings[ratings['userId'] == user_id]['movieId'].unique()
+    print(rated_movie_ids)
     movies_rating_tags_df = create_weighted_rating_tags_df(movies, ratings, tags)
-    movies_rating_tags_df = movies_rating_tags_df[~movies_rating_tags_df['movieId'].isin(rated_movie_ids)]
+    print(len(movies_rating_tags_df))
+    movies_rating_tags_df_without_history = movies_rating_tags_df[~movies_rating_tags_df['movieId'].isin(rated_movie_ids)]
+    print(len(movies_rating_tags_df))
+
 
 
     user = await session.get(User, user_id)
@@ -517,7 +527,7 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
     disliked_genres = user.genresDislike
     user_preferences = {'preferred_genres': preferred_genres, 'disliked_genres': disliked_genres}
 
-    k_recommendations_ids = knowledge_based_recommendation(movies_rating_tags_df, user_preferences)
+    k_recommendations_ids = knowledge_based_recommendation(movies_rating_tags_df_without_history, user_preferences)
     print(k_recommendations_ids)
 
     ratings_user = ratings[ratings['userId'] == user_id]
@@ -528,16 +538,16 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
 
     user_preferences_movies = {'liked_movies': title_list}
 
-    content_based_recommendations_ids = content_based_recommendation(movies_rating_tags_df, user_preferences_movies, user_preferences)
+    content_based_recommendations_ids = content_based_recommendation(movies_rating_tags_df_without_history, user_preferences_movies, user_preferences)
     print(content_based_recommendations_ids)
 
-    collaborative_filtering_recommendations_ids = collaborative_filtering_recommendation(ratings, user_id, 5, 5)
+    collaborative_filtering_recommendations_ids = collaborative_filtering_recommendation(ratings, user_id, 5, 15)
     print(collaborative_filtering_recommendations_ids)
 
 
     recommendations_hybrid = hybrid_based_recommendation(k_recommendations_ids,content_based_recommendations_ids, collaborative_filtering_recommendations_ids)
     
-    movies_recommend = movies_rating_tags_df[movies_rating_tags_df['movieId'].isin(recommendations_hybrid)]
+    movies_recommend = movies_rating_tags_df_without_history[movies_rating_tags_df_without_history['movieId'].isin(recommendations_hybrid)]
 
     print(user_preferences)
     movies_to_recommend = movies_recommend[~movies_recommend['genres'].apply(lambda genres: any(disliked_genre in genres for disliked_genre in user_preferences['disliked_genres']))]
