@@ -126,9 +126,9 @@ export class PersonalizedRecommendationsComponent {
 
   }
   rateMovie(stars: number, movieId: number) {
-    
-    this.hasRated= true;
+    this.getPersonalizedMovies();
 
+    this.hasRated= true;
     this.rating = stars;
     console.log(this.idMovie)
     console.log("fernando"+this.movieID)

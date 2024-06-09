@@ -61,31 +61,42 @@ export class FavoriteGenresComponent {
   selectedGenres: Genre[] = [];
   leastfavoriteselectedGenres: Genre[] =[]
   toggleSelection(genre: Genre): void {
+    const foundGenre = this.genres1.find(g => g.id === genre.id);
+  
+  if (foundGenre && foundGenre.selected) {
     if (genre.selected) {
       this.selectedGenres = this.selectedGenres.filter(g => g.id !== genre.id);
     } else {
       if (this.selectedGenres.length < 5) {
         this.selectedGenres.push(genre);
+        genre.selected = !genre.selected;
+
       } else {
         // Limite de 5 gêneros já selecionados
         // Você pode exibir uma mensagem para o usuário aqui
       }
     }
-    genre.selected = !genre.selected;
-  }
+  }else{console.log("ja existe1")}
+}
   toggle1Selection(genre: Genre): void {
+    const foundGenre = this.genres.find(g => g.id === genre.id);
+  
+    if (foundGenre && foundGenre.selected) {
     if (genre.selected) {
       this.leastfavoriteselectedGenres = this.leastfavoriteselectedGenres.filter(g => g.id !== genre.id);
     } else {
       if (this.leastfavoriteselectedGenres.length < 5) {
         this.leastfavoriteselectedGenres.push(genre);
+        genre.selected = !genre.selected;
+
       } else {
         // Limite de 5 gêneros já selecionados
         // Você pode exibir uma mensagem para o usuário aqui
       }
     }
-    genre.selected = !genre.selected;
   }
+  else{console.log("ja existe1")}
+}
   submitGenres(): void {
     if (this.selectedGenres.length < 3) {
       alert('Pelo menos 3 géneros devem ser selecionados.');
@@ -100,7 +111,7 @@ export class FavoriteGenresComponent {
           // Lógica adicional para lidar com o sucesso
           console.log('Géneros registados com sucesso!');
           this.authService.setUserEmail(this.authService.getNewUserEmail())
-          this.router.navigate(['/personalized-recommendations'])
+          location.reload();
         } else {
           // Lógica adicional para lidar com o fracasso
           console.log('Falha ao registar os géneros.');

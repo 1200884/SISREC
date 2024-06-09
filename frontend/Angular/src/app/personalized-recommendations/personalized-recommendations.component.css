@@ -126,8 +126,15 @@
     margin-top: 10px;
     font-weight: bold;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  
-  }.filter-container {
+    width: 250px; /* Define a largura fixa desejada */
+    white-space: nowrap; /* Impede que o texto quebre para a próxima linha */
+    overflow: hidden; /* Oculta o texto que excede a largura */
+    text-overflow: ellipsis; /* Adiciona "..." no final do texto que excede a largura */
+    text-align: center; /* Opcional: centraliza o texto horizontalmente */
+    font-size: 10px; /* Define um tamanho de fonte consistente */
+    line-height: 1.5; /* Ajusta a altura da linha para uma melhor legibilidade */
+  }
+  .filter-container {
     display: flex;
     justify-content: center;
     align-items: center;
