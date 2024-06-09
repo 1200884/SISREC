@@ -387,11 +387,16 @@ async def personalisedknowledge(*, session: AsyncSession = Depends(get_db), user
 
 @router.get("/personalizedHybrid", summary="Get personalized recommendations by hybrid filtering")
 async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id: int):
+    user_id = user_id
     script_dir = os.path.dirname(__file__)
     movies = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/movies_full_2.csv"))
     ratings = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/ratings.csv"))
     tags = pd.read_csv(os.path.join(script_dir,"../recommender/dataset/small_dataset/tags.csv"))
-    def create_weighted_rating_tags_df(movies_df, ratings_df, tags_df):
+
+    rated_movie_ids = ratings[ratings['userId'] == user_id]['movieId'].unique()
+
+
+    def create_weighted_rating_tags_df(movies_df, ratings_df, tags_df): # vamos retirar deste dataframe os filmes que o user já deu rating
         movies_rating_user_df = pd.merge(movies_df, ratings_df, on="movieId", how="inner")
 
         movies_rating_df = movies_rating_user_df[['movieId', 'title', 'rating', 'genres', 'year', 'url']].groupby(['movieId', 'title', 'genres', 'year', 'url'])['rating'].agg(['count', 'mean']).round(1)
@@ -478,8 +483,8 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
     
     def hybrid_based_recommendation(knowledge_recommendations_ids, content_recommendations_ids, collaborative_recommendations_ids):
 
-        knowledge_weight = 1
-        content_weight = 1
+        knowledge_weight = 0.4
+        content_weight = 0.8
         collaborative_weight = 1
 
         # Calculate the number of movies to be recommended from each technique
@@ -502,6 +507,9 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
         return combined_recommendations
     
     movies_rating_tags_df = create_weighted_rating_tags_df(movies, ratings, tags)
+    movies_rating_tags_df = movies_rating_tags_df[~movies_rating_tags_df['movieId'].isin(rated_movie_ids)]
+
+
     user = await session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="user not found")
