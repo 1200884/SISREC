@@ -61,9 +61,6 @@ export class FavoriteGenresComponent {
   selectedGenres: Genre[] = [];
   leastfavoriteselectedGenres: Genre[] =[]
   toggleSelection(genre: Genre): void {
-    const foundGenre = this.genres1.find(g => g.id === genre.id);
-  
-  if (foundGenre && foundGenre.selected) {
     if (genre.selected) {
       this.selectedGenres = this.selectedGenres.filter(g => g.id !== genre.id);
     } else {
@@ -76,12 +73,8 @@ export class FavoriteGenresComponent {
         // Você pode exibir uma mensagem para o usuário aqui
       }
     }
-  }else{console.log("ja existe1")}
-}
+  }
   toggle1Selection(genre: Genre): void {
-    const foundGenre = this.genres.find(g => g.id === genre.id);
-  
-    if (foundGenre && foundGenre.selected) {
     if (genre.selected) {
       this.leastfavoriteselectedGenres = this.leastfavoriteselectedGenres.filter(g => g.id !== genre.id);
     } else {
@@ -95,8 +88,6 @@ export class FavoriteGenresComponent {
       }
     }
   }
-  else{console.log("ja existe1")}
-}
   submitGenres(): void {
     if (this.selectedGenres.length < 3) {
       alert('Pelo menos 3 géneros devem ser selecionados.');
