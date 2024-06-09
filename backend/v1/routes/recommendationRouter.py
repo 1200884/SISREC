@@ -183,39 +183,84 @@ async def personalisedColaborative(*, session: AsyncSession = Depends(get_db),us
         movies_rating_tags_df.sort_values(by='weighted_rating', ascending=False, inplace=True)
         return movies_rating_tags_df
     
-    def create_utility_matrix(df):
-        utility_matrix = df.pivot(index='userId', columns='movieId', values='rating').fillna(0)
-        return utility_matrix
+    # def create_utility_matrix(df):
+    #     utility_matrix = df.pivot(index='userId', columns='movieId', values='rating').fillna(0)
+    #     return utility_matrix
 
 
 
-    def collaborative_filtering_recommendation(df, user_id, k, num_recommendations):
-        utility_matrix = create_utility_matrix(df)
-        user_indices = {user_id: idx for idx, user_id in enumerate(utility_matrix.index)}
-        if user_id not in user_indices:
-            print("User ID does not exist.")
-            return []
-        user_similarity = cosine_similarity(utility_matrix)
-        knn = NearestNeighbors(n_neighbors=k, metric='cosine')
-        knn.fit(user_similarity)
-        _, indices = knn.kneighbors([user_similarity[user_indices[user_id]]])
-        neighbor_ratings = utility_matrix.iloc[indices[0]]
-        item_ratings = neighbor_ratings.mean(axis=0)
-        user_ratings = utility_matrix.loc[user_id]
-        recommended_items = item_ratings[user_ratings == 0].sort_values(ascending=False).index.tolist()[:num_recommendations]
+    # def collaborative_filtering_recommendation(df, user_id, k, num_recommendations):
+    #     utility_matrix = create_utility_matrix(df)
+    #     user_indices = {user_id: idx for idx, user_id in enumerate(utility_matrix.index)}
+    #     if user_id not in user_indices:
+    #         print("User ID does not exist.")
+    #         return []
+    #     user_similarity = cosine_similarity(utility_matrix)
+    #     knn = NearestNeighbors(n_neighbors=k, metric='cosine')
+    #     knn.fit(user_similarity)
+    #     _, indices = knn.kneighbors([user_similarity[user_indices[user_id]]])
+    #     neighbor_ratings = utility_matrix.iloc[indices[0]]
+    #     item_ratings = neighbor_ratings.mean(axis=0)
+    #     user_ratings = utility_matrix.loc[user_id]
+    #     recommended_items = item_ratings[user_ratings == 0].sort_values(ascending=False).index.tolist()[:num_recommendations]
         
-        # # Filter out recommended items based on user preferences
-        # if user_preferences['disliked_genres']:
-        #     df_filtered = movies_rating_tags_df[~movies_rating_tags_df['genres'].apply(lambda x: any(genre in user_preferences['disliked_genres'] for genre in x))]
-        #     recommended_items = [item for item in recommended_items if item in df_filtered['movieId']]
+    #     # # Filter out recommended items based on user preferences
+    #     # if user_preferences['disliked_genres']:
+    #     #     df_filtered = movies_rating_tags_df[~movies_rating_tags_df['genres'].apply(lambda x: any(genre in user_preferences['disliked_genres'] for genre in x))]
+    #     #     recommended_items = [item for item in recommended_items if item in df_filtered['movieId']]
         
-        return movies_rating_tags_df.loc[recommended_items, 'movieId'].tolist()
+    #     return movies_rating_tags_df.loc[recommended_items, 'movieId'].tolist()
     
     movies_rating_tags_df = create_weighted_rating_tags_df(movies, ratings, tags)
 
-    movies_recomend_ids = collaborative_filtering_recommendation(ratings, user_id, 5, 5)
+    # movies_recomend_ids = collaborative_filtering_recommendation(ratings, user_id, 5, 5)
 
-    movies_recomend_df = movies_rating_tags_df[movies_rating_tags_df['movieId'].isin(movies_recomend_ids)]
+    def create_X(df):
+    
+        M = df['userId'].nunique()
+        N = df['movieId'].nunique()
+
+        user_mapper = dict(zip(np.unique(df["userId"]), list(range(M))))
+        movie_mapper = dict(zip(np.unique(df["movieId"]), list(range(N))))
+        
+        user_inv_mapper = dict(zip(list(range(M)), np.unique(df["userId"])))
+        movie_inv_mapper = dict(zip(list(range(N)), np.unique(df["movieId"])))
+        
+        user_index = [user_mapper[i] for i in df['userId']]
+        item_index = [movie_mapper[i] for i in df['movieId']]
+
+        X = csr_matrix((df["rating"], (user_index,item_index)), shape=(M,N))
+        
+        return X, user_mapper, movie_mapper, user_inv_mapper, movie_inv_mapper
+
+    
+
+
+    def collaborative_filtering_recommendation(movie_id, X, movie_mapper, movie_inv_mapper, k, metric='cosine'):
+        X = X.T
+        neighbour_ids = []
+        
+        movie_ind = movie_mapper[movie_id]
+        movie_vec = X[movie_ind]
+        if isinstance(movie_vec, (np.ndarray)):
+            movie_vec = movie_vec.reshape(1,-1)
+        # use k+1 since kNN output includes the movieId of interest
+        kNN = NearestNeighbors(n_neighbors=k+1, algorithm="brute", metric=metric)
+        kNN.fit(X)
+        neighbour = kNN.kneighbors(movie_vec, return_distance=False)
+        for i in range(0,k):
+            n = neighbour.item(i)
+            neighbour_ids.append(movie_inv_mapper[n])
+        neighbour_ids.pop(0)
+        return neighbour_ids
+    
+
+    X, user_mapper, movie_mapper, user_inv_mapper, movie_inv_mapper = create_X(ratings)
+
+    collaborative_filtering_recommendations_ids = collaborative_filtering_recommendation(1, X, movie_mapper, movie_inv_mapper, k=10)
+
+
+    movies_recomend_df = movies_rating_tags_df[movies_rating_tags_df['movieId'].isin(collaborative_filtering_recommendations_ids)]
     
     return movies_recomend_df.to_dict(orient='records')
 
