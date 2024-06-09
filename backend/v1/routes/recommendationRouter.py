@@ -422,11 +422,12 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
 
     def knowledge_based_recommendation(df, user_preferences):
         recommended_movies = df[df['genres'].apply(lambda x: isinstance(x, list) and any(genre in user_preferences['preferred_genres'] for genre in x))]
-
+        print(len(recommended_movies))
         if user_preferences['disliked_genres']:
             recommended_movies = recommended_movies[~recommended_movies['genres'].apply(lambda x: isinstance(x, list) and any(genre in user_preferences['disliked_genres'] for genre in x))]
 
-        return recommended_movies.head(5)['movieId'].tolist()
+        print(len(recommended_movies))
+        return recommended_movies.head(10)['movieId'].tolist()
     
     def content_based_recommendation(df, last_seen_movies, user_preferences):
         
@@ -441,11 +442,12 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
             if len(movie_indices) > 0:
                 idx = movie_indices[0]
                 similar_movies_indices.extend(cosine_sim[idx].argsort()[-21:-1])  # Get top 20 similar movies
-        similar_movies_indices = list(set(similar_movies_indices) - set(df.index[df['title'].isin(last_seen_movies)]))        
+        similar_movies_indices = list(set(similar_movies_indices) - set(df.index[df['title'].isin(last_seen_movies)]))    
+        print(similar_movies_indices)    
         if user_preferences['disliked_genres']:
             disliked_genres = user_preferences['disliked_genres']
             similar_movies_indices = [idx for idx in similar_movies_indices if not any(genre in disliked_genres for genre in df.loc[idx, 'genres'])]
-        return df.loc[similar_movies_indices[:15], 'movieId'].tolist()
+        return df.loc[similar_movies_indices[:10], 'movieId'].tolist()
 
     def create_utility_matrix(df):
         utility_matrix = df.pivot(index='userId', columns='movieId', values='rating').fillna(0)
@@ -483,8 +485,8 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
     
     def hybrid_based_recommendation(knowledge_recommendations_ids, content_recommendations_ids, collaborative_recommendations_ids):
 
-        knowledge_weight = 0.4
-        content_weight =    1
+        knowledge_weight = 1
+        content_weight =    0.8
         collaborative_weight = 1
 
         
@@ -538,10 +540,10 @@ async def personalisedHybrid(*, session: AsyncSession = Depends(get_db), user_id
 
     user_preferences_movies = {'liked_movies': title_list}
 
-    content_based_recommendations_ids = content_based_recommendation(movies_rating_tags_df_without_history, user_preferences_movies, user_preferences)
+    content_based_recommendations_ids = content_based_recommendation(movies_rating_tags_df, user_preferences_movies, user_preferences)
     print(content_based_recommendations_ids)
 
-    collaborative_filtering_recommendations_ids = collaborative_filtering_recommendation(ratings, user_id, 5, 15)
+    collaborative_filtering_recommendations_ids = collaborative_filtering_recommendation(ratings, user_id, 5, 10)
     print(collaborative_filtering_recommendations_ids)
 
 
