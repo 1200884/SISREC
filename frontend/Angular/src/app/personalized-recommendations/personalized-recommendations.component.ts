@@ -21,7 +21,8 @@ export class PersonalizedRecommendationsComponent {
   rating: number = 0;
   title: any ='';
   selectedMovie: Movie | null = null; // Inicializando como null
-  idMovie=this.selectedMovie?.id;
+  idMovie=this.selectedMovie?.movie_id;
+  movieID: any = '';
   constructor(private http: HttpClient, private authservice:AuthService) {}
 
   ngOnInit() {
@@ -30,7 +31,8 @@ export class PersonalizedRecommendationsComponent {
   }
   getTitle(){
     this.title= this.selectedMovie?.title;
-    console.log(this.title)
+    console.log(this.title);
+    
   }
   getPersonalizedMovies() {
     this.authservice.getPersonalizedHybrid(this.authservice.getUserId()).subscribe(
@@ -106,13 +108,26 @@ export class PersonalizedRecommendationsComponent {
     console.log(this.selectedMovie?.url)
     this.getTitle();
     this.getPersonalizedContentMovies();
+    this.movieID=movie.movieId;
+    console.log("movieID ->"+this.movieID);
+    console.log("title ->"+movie.title);
+    console.log("genres ->"+movie.genres);
+    console.log("titlelower ->"+movie.titlelower);
+
+    console.log("MovieId ->->"+movie.MovieId);
+    console.log("year->"+movie.year);
+    console.log("movie_id"+movie.movie_id)
+    console.log("id"+movie.id)
+    console.log("id"+movie.movieId)
+
+
   }
   rateMovie(stars: number, movieId: number) {
     this.rating = stars;
     console.log(this.idMovie)
-    console.log(this.selectedMovie?.id)
+    console.log("fernando"+this.movieID)
     console.log("Estrelas -> " + stars);
-    this.authservice.rate(stars, movieId).subscribe(
+    this.authservice.rate(stars, this.movieID).subscribe(
       (result) => {
         if (result) {
           console.log(result)

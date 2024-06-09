@@ -39,7 +39,7 @@
   <img [src]="selectedMovie.url" alt="Capa do Filme" class="movie-image">
   <div class="rating">
     <p>Rate this movie!</p>
-    <span *ngFor="let star of [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]" (click)="rateMovie(star, selectedMovie.id)">
+    <span *ngFor="let star of [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]" (click)="rateMovie(star, selectedMovie.movie_id)">
       <i class="fas fa-star" [class.active]="star <= rating"></i>
     </span>
   </div>
