@@ -36,6 +36,7 @@
     "bootstrap": "^5.2.3",
     "date-fns": "^2.30.0",
     "fs-web": "^1.0.1",
+    "material": "^0.9.11",
     "mocha": "^10.1.0",
     "ngx-pagination": "^6.0.3",
     "rxjs": "~7.5.0",
