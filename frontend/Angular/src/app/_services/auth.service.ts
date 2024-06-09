@@ -145,14 +145,15 @@ export class AuthService {
   {
     return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONSNONPERSONALIZEDDECADE+"/"+decade);
   }
-  getPersonalizedCollaborative(userId:string):Observable<Movie[]>
-  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDCONTENT+userId)}
-  getPersonalizedContent(searchquery:string):Observable<Movie[]>
-  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDCONTENT)}
+  getPersonalizedCollaborative(userId:number):Observable<Movie[]>
+  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDCOLLABORATIVE+"/"+userId)}
+  getPersonalizedContent(user_id:number,title:string):Observable<Movie[]>{
+    return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDCONTENT+"?title="+title+"&user_id="+user_id);
+   } 
   getPersonalizedKnowledge(searchquery:string):Observable<Movie[]>
   {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDKNOWLEDGE)}
-  getPersonalizedHybrid(searchquery:string):Observable<Movie[]>
-  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDHYBRID)}
+  getPersonalizedHybrid(searchquery:number):Observable<Movie[]>
+  {return this.http.get<Movie[]>(environment.BACKEND_URL_LOCAL+environment.RECOMMENDATIONPERSONALIZEDHYBRID+"?user_id="+searchquery)}
 
 
   getPersonalizedMovies(searchquery:string):Observable<Movie[]>

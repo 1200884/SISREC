@@ -21,6 +21,7 @@ import { AccountSettingsComponent } from './account-settings/account-settings.co
 import { UserLoginComponent } from './user-login/user-login.component';
 import { PersonalizedRecommendationsComponent } from './personalized-recommendations/personalized-recommendations.component';
 import { FavoriteGenresComponent } from './favorite-genres/favorite-genres.component';
+import { MoviessimilaarPerfilComponent } from './moviessimilaar-perfil/moviessimilaar-perfil.component';
 const routes: Routes = [
   //{ path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'users', component: GetUsersComponent },
@@ -42,7 +43,8 @@ const routes: Routes = [
   {path: 'account-settings', component: AccountSettingsComponent},
   {path: 'user-login', component: UserLoginComponent},
   {path: 'personalized-recommendations', component: PersonalizedRecommendationsComponent},
-  {path: 'favorite-genres', component: FavoriteGenresComponent}
+  {path: 'favorite-genres', component: FavoriteGenresComponent},
+  {path: 'moviessimilaar-perfil', component: MoviessimilaarPerfilComponent}
   //{ path: 'login/callback', component: OktaCallbackComponent },
 ];
 

@@ -9,8 +9,8 @@
   
   /* Estilos para os botões */
   .button-container button {
-    width: 200px; /* Largura dos botões */
-    height: 60px; /* Altura dos botões */
+    width: 250px; /* Largura dos botões */
+    height: 80px; /* Altura dos botões */
     font-size: 18px; /* Tamanho da fonte dentro dos botões */
     margin: 0 20px; /* Espaçamento horizontal adicional entre os botões, se necessário */
 
