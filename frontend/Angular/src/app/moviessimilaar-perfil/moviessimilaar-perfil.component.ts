@@ -38,6 +38,7 @@ export class MoviessimilaarPerfilComponent {
         this.error = 'Ocorreu um erro ao obter filmes personalizados. Tente novamente mais tarde.';
       }
     );
+    console.log(this.personalizedMoviesCollaborative)
   }
   selectMovie(movie: any) {
     console.log('Movie selected:', movie);

@@ -1,5 +1,5 @@
 <div class="personalized-movies-container" *ngIf="personalizedMovies.length > 0">
-  <h3>Personalized Recommendations</h3>
+  <h2>Personalized Recommendations</h2>
   <div class="movie-list">
     <div *ngFor="let movie of personalizedMovies" class="movie-item"(click)="selectMovie(movie)">
       <div class="movie-content">
@@ -12,6 +12,7 @@
 </div>
 
 <div class="search-container">
+  <label class="search-label">Search Movie: </label>
   <input type="text" [(ngModel)]="searchQuery" (input)="searchMovies()" placeholder="Search Movies">
   <div class="dropdown" *ngIf="movies.length > 0">
     <button class="dropbtn" (mouseenter)="openDropdown()">Choose Movie</button>
@@ -32,22 +33,23 @@
 </div>
 
 
-<div *ngIf="selectedMovie">
-  <h2>{{ selectedMovie.title }} ,  ({{selectedMovie.year}})</h2>
+
+<div *ngIf="selectedMovie" class="selected-movie-container">
+  <h2>{{ selectedMovie.title }} ({{selectedMovie.year}})</h2>
   <img [src]="selectedMovie.url" alt="Capa do Filme" class="movie-image">
-  <p>{{ selectedMovie.weighted_rating }}</p>
   <div class="rating">
-    Rate this movie!
+    <p>Rate this movie!</p>
     <span *ngFor="let star of [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]" (click)="rateMovie(star, selectedMovie.id)">
       <i class="fas fa-star" [class.active]="star <= rating"></i>
     </span>
   </div>
-  
+  <p>Your Rating: {{rating}} stars</p>
+</div>
 
-Your Rating: {{rating}} stars
+
 
 <div class="personalized-content-movies-container" *ngIf="personalizedMoviesContent.length > 0">
-  <h3>Movies Recommended Based on "{{ title }}"</h3>
+  <h2>Movies Recommended Based on "{{ title }}"</h2>
   <div class="movie-list">
     <div *ngFor="let movie of personalizedMoviesContent" class="movie-item">
       <div class="movie-content">

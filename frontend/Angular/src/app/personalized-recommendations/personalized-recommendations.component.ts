@@ -26,7 +26,7 @@ export class PersonalizedRecommendationsComponent {
 
   ngOnInit() {
     this.getPersonalizedMovies();
-
+    this.searchMovies();
   }
   getTitle(){
     this.title= this.selectedMovie?.title;
@@ -73,7 +73,7 @@ export class PersonalizedRecommendationsComponent {
     this.filteredMovies = [];
     this.error = null;
 
-    if (this.searchQuery.length >= 3) {
+    if (this.searchQuery.length >= 0) {
       this.authservice.getPersonalizedMovies(this.searchQuery)
         .subscribe({
           next: (data) => {
