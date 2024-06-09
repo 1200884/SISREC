@@ -59,7 +59,24 @@ export class FavoriteGenresComponent {
   ];
   constructor(private authService: AuthService, private router: Router) { }
   selectedGenres: Genre[] = [];
+  booleazn: boolean=true;
   leastfavoriteselectedGenres: Genre[] =[]
+  checkSelection(genre:Genre):boolean{
+    const foundGenre = this.genres1.find(g => g.id === genre.id);
+  
+    if (foundGenre && foundGenre.selected ==true) {
+      return false;
+    }
+    return true;
+  }
+  check1Selection(genre:Genre):boolean{
+    const foundGenre = this.genres.find(g => g.id === genre.id);
+  
+    if (foundGenre && foundGenre.selected == true) {
+return false;
+    }
+    return true;
+  }
   toggleSelection(genre: Genre): void {
     if (genre.selected) {
       this.selectedGenres = this.selectedGenres.filter(g => g.id !== genre.id);
