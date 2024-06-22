@@ -46,11 +46,6 @@ for ind in df_movies.index[1131:]:
     sleep(3.65)
     url = f"https://moviesdatabase.p.rapidapi.com/titles/{imdb_id}"
 
-    headers = {
-	    "X-RapidAPI-Key": "174a58e097msh81d5098306d3361p11bf32jsn1f72518f466c",
-	    "X-RapidAPI-Host": "moviesdatabase.p.rapidapi.com"
-    }
-
     response = requests.get(url, headers=headers)
     json = response.json()
     if json['results'] == None:
