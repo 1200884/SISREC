@@ -109,10 +109,10 @@ export class FavoriteGenresComponent implements OnInit {
         this.deselectInOtherArray(genre, this.genres);
         genre.selected = true;
       } else {
-        alert('You can only select up to 5 least favorite genres, so only the first 5 will be considered.');
+        alert('You can only select up to 5 leasst favorite genres, so only the first 5 will be considered.');
         this.deselectInOtherArray(genre, this.genres1);
         genre.selected = false;
-
+        
       }
     }
   }
